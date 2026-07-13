@@ -1,6 +1,6 @@
 # RushBank
 
-RushBank, Unity 6 LTS ile geliştirilen 3D mobil banka simülasyonu oyunudur. Amaç, Türkiye'deki banka deneyimlerinden esinlenen, senaryo tabanlı ve oynanabilir bir banka ortamı kurmaktır.
+RushBank, Unity 6 LTS ile geliştirilen 3D mobil banka simülasyonu oyunudur. Oyuncu banka görevlisi rolündedir; müşteriler sırayla şubeye gelir, farklı işlem istekleri oluşturur ve oyuncu bu işlemleri hızlı tamamlayarak puan, combo ve multiplier kazanır.
 
 Proje PR akışıyla geliştiriliyor. `main` branch'ine direkt push yapılmaz; yapılan işler feature branch üzerinde hazırlanır, GitHub'a push edilir ve Yusuf'un onayından sonra merge edilir.
 
@@ -14,20 +14,43 @@ Mevcut repo bir Unity proje iskeleti içerir:
   - `Bootstrap`: oyunun başlangıç akışını kurar.
   - `GameManager`: oyun durumunu sahneler arasında taşır.
   - `SceneLoader`: sahne geçişlerini tek noktadan yönetir.
-- Henüz oynanabilir sahneler, UI ekranları, 3D banka ortamı ve senaryolar eklenmedi.
+- Gameplay temeli eklenmeye başladı:
+  - Müşteri isteği modeli
+  - Müşteri tipi modeli
+  - Müşteri kuyruk yöneticisi
+  - Gişe servis kontrolcüsü
+  - Skor, combo ve multiplier yöneticisi
+- UI temeli eklenmeye başladı:
+  - Ana menü UXML/USS
+  - Ayarlar paneli
+  - Oyun içi HUD
+  - Ses ve titreşim ayarlarını kaydeden controller
+- Henüz oynanabilir sahneler, UI ekranları ve 3D banka ortamı eklenmedi.
 
 ## Oyun Hedefi
 
-İlk ürün hedefi, 3D bir banka simülasyonu temeli oluşturmaktır:
+İlk ürün hedefi, 3D bir banka gişe simülasyonu temeli oluşturmaktır:
 
 - Giriş ekranı
-- Oyuncu profili veya oturum başlangıcı
-- Banka içi 3D ortam
-- Senaryo tabanlı görevler
-- Bankacılık işlemlerini simüle eden kullanıcı akışları
-- Mobil odaklı kamera ve kontrol sistemi
+- Gişe odaklı banka içi 3D ortam
+- Zaman içinde sıraya giren müşteriler
+- Farklı müşteri tipleri ve işlem istekleri
+- İşlem süresine bağlı skor sistemi
+- Kalan süreye göre combo ve multiplier puanı
+- Mobil odaklı kamera ve etkileşim sistemi
 
 Gerçek banka isimleri, marka kullanımı ve görsel benzerlikler ileride ayrıca değerlendirilecektir. Gerekirse kurgusal banka isimleriyle ilerlenir.
+
+## Temel Oyun Döngüsü
+
+1. Oyun turu başlar.
+2. Müşteri şubeye girer ve sıraya eklenir.
+3. Sıradaki müşteri gişeye gelir.
+4. Müşteri tipi ve işlem isteği gösterilir.
+5. Oyuncu işlemi hedef süre içinde tamamlamaya çalışır.
+6. İşlem bitince skor hesaplanır.
+7. Hedef süreden kalan zaman varsa combo ilerler ve multiplier artar.
+8. Yeni müşteri çağrılır.
 
 ## Klasör Yapısı
 
@@ -39,10 +62,28 @@ Assets/
   Scenes/         Unity sahneleri
   Scripts/
     Core/         Oyun başlangıcı, durum yönetimi, sahne yükleme
+    Gameplay/     Müşteri, gişe, senaryo, skor ve etkileşim sistemleri
     UI/           Arayüz scriptleri
+  UI/
+    UXML/         UI Toolkit ekran yapıları
+    Styles/       Ortak UI teması
 Packages/         Unity paket bağımlılıkları
 ProjectSettings/  Unity proje ayarları
+docs/             Ürün brief'i, backlog ve karar notları
 ```
+
+## UI Akışı
+
+İlk UI katmanı Unity UI Toolkit ile hazırlanmıştır:
+
+- `MainMenu.uxml`: giriş, senaryo ve ayarlar ekranı
+- `GameHud.uxml`: skor, combo, multiplier, aktif müşteri ve işlem paneli
+- `RushBankTheme.uss`: ortak modern görsel stil
+- `MainMenuUIController`: menü butonları ve ayarlar paneli
+- `GameHudUIController`: oyun içi sayaçlar ve işlem butonları
+- `AppSettings`: ses ve titreşim tercihlerini `PlayerPrefs` ile saklar
+
+Unity sahnesinde kullanmak için ilgili GameObject'e `UIDocument` eklenir, UXML asset'i atanır ve uygun controller component'i bağlanır.
 
 ## Core Akışı
 
@@ -136,4 +177,4 @@ Ardından GitHub üzerinden PR açılır. PR Yusuf tarafından incelenir ve onay
 - Aynı `.unity` sahnesinde aynı anda çalışmamaya dikkat edilir.
 - Sahne ve prefab değişiklikleri mümkün olduğunca küçük PR'lara bölünür.
 - Büyük binary dosyalar için gerekirse Git LFS değerlendirilir.
-- İlk oynanabilir hedef: giriş ekranı, temel sahne geçişi ve banka içi 3D prototip akışı.
+- İlk oynanabilir hedef: giriş ekranı, temel sahne geçişi, gişe ekranı, sırayla gelen müşteriler ve skor/combo prototipi.

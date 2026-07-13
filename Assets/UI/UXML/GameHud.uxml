@@ -1,0 +1,37 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <Style src="../Styles/RushBankTheme.uss" />
+
+    <ui:VisualElement class="screen hud-screen">
+        <ui:VisualElement class="top-hud">
+            <ui:VisualElement class="hud-pill">
+                <ui:Label text="Skor" class="hud-label" />
+                <ui:Label name="score-label" text="0" class="hud-value" />
+            </ui:VisualElement>
+
+            <ui:VisualElement class="hud-pill combo-pill">
+                <ui:Label text="Combo" class="hud-label" />
+                <ui:Label name="combo-label" text="0" class="hud-value" />
+            </ui:VisualElement>
+
+            <ui:VisualElement class="hud-pill">
+                <ui:Label text="Çarpan" class="hud-label" />
+                <ui:Label name="multiplier-label" text="x1.00" class="hud-value" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <ui:VisualElement class="service-panel">
+            <ui:Label name="customer-name-label" text="Sıradaki müşteri bekleniyor" class="service-title" />
+            <ui:Label name="request-name-label" text="Gişeye müşteri geldiğinde işlem burada görünür." class="service-request" />
+            <ui:Label name="request-line-label" text="" class="service-copy" />
+
+            <ui:VisualElement class="timer-track">
+                <ui:VisualElement name="timer-fill" class="timer-fill" />
+            </ui:VisualElement>
+
+            <ui:VisualElement class="service-actions">
+                <ui:Button name="complete-request-button" text="İşlemi Tamamla" class="primary-button" />
+                <ui:Button name="call-next-button" text="Sıradaki" class="secondary-button" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>
