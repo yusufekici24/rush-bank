@@ -1,0 +1,44 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <Style src="../Styles/RushBankTheme.uss" />
+
+    <ui:VisualElement class="screen menu-screen">
+        <ui:VisualElement class="brand-bar">
+            <ui:Label text="RushBank" class="brand-title" />
+            <ui:Button name="settings-button" text="Ayarlar" class="ghost-button" />
+        </ui:VisualElement>
+
+        <ui:VisualElement class="hero">
+            <ui:Label text="Gişe vardiyan başlıyor." class="hero-title" />
+            <ui:Label text="Müşterileri sırayla karşıla, işlemleri hızlı bitir, combo puanını yükselt." class="hero-copy" />
+
+            <ui:VisualElement class="menu-actions">
+                <ui:Button name="start-button" text="Vardiyaya Başla" class="primary-button" />
+                <ui:Button name="scenario-button" text="Senaryolar" class="secondary-button" />
+                <ui:Button name="quit-button" text="Çıkış" class="text-button" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <ui:VisualElement name="settings-panel" class="settings-panel hidden">
+            <ui:VisualElement class="panel-header">
+                <ui:Label text="Ayarlar" class="panel-title" />
+                <ui:Button name="close-settings-button" text="Kapat" class="ghost-button" />
+            </ui:VisualElement>
+
+            <ui:VisualElement class="setting-row">
+                <ui:VisualElement>
+                    <ui:Label text="Ses" class="setting-title" />
+                    <ui:Label text="Oyun seslerini aç veya kapat." class="setting-copy" />
+                </ui:VisualElement>
+                <ui:Toggle name="sound-toggle" class="settings-toggle" />
+            </ui:VisualElement>
+
+            <ui:VisualElement class="setting-row">
+                <ui:VisualElement>
+                    <ui:Label text="Titreşim" class="setting-title" />
+                    <ui:Label text="Mobil cihazlarda dokunsal geri bildirimi yönet." class="setting-copy" />
+                </ui:VisualElement>
+                <ui:Toggle name="vibration-toggle" class="settings-toggle" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>
