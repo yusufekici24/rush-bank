@@ -1,78 +1,139 @@
 # RushBank
 
-Mobil oyun projesi (Unity).
+RushBank, Unity 6 LTS ile geliştirilen 3D mobil banka simülasyonu oyunudur. Amaç, Türkiye'deki banka deneyimlerinden esinlenen, senaryo tabanlı ve oynanabilir bir banka ortamı kurmaktır.
 
-**Unity sürümü:** Unity 6 LTS (6000.0.x). Unity Hub'dan 6000.0.23f1 veya daha
-yeni bir 6000.0 sürümü kurun; ilk açılışta sürüm yükseltme sorarsa onaylayın.
+Proje PR akışıyla geliştiriliyor. `main` branch'ine direkt push yapılmaz; yapılan işler feature branch üzerinde hazırlanır, GitHub'a push edilir ve Yusuf'un onayından sonra merge edilir.
 
-## Kurulum (yeni katılan geliştirici için)
+## Proje Durumu
 
-1. Unity Hub ve Unity 6 LTS'i kur.
-2. Projeyi klonla:
+Mevcut repo bir Unity proje iskeleti içerir:
+
+- Unity sürümü: `6000.0.23f1`
+- Temel klasör yapısı hazır: `Assets`, `Packages`, `ProjectSettings`
+- Core scriptleri hazır:
+  - `Bootstrap`: oyunun başlangıç akışını kurar.
+  - `GameManager`: oyun durumunu sahneler arasında taşır.
+  - `SceneLoader`: sahne geçişlerini tek noktadan yönetir.
+- Henüz oynanabilir sahneler, UI ekranları, 3D banka ortamı ve senaryolar eklenmedi.
+
+## Oyun Hedefi
+
+İlk ürün hedefi, 3D bir banka simülasyonu temeli oluşturmaktır:
+
+- Giriş ekranı
+- Oyuncu profili veya oturum başlangıcı
+- Banka içi 3D ortam
+- Senaryo tabanlı görevler
+- Bankacılık işlemlerini simüle eden kullanıcı akışları
+- Mobil odaklı kamera ve kontrol sistemi
+
+Gerçek banka isimleri, marka kullanımı ve görsel benzerlikler ileride ayrıca değerlendirilecektir. Gerekirse kurgusal banka isimleriyle ilerlenir.
+
+## Klasör Yapısı
+
+```text
+Assets/
+  Art/            Görsel varlıklar
+  Audio/          Ses ve müzik dosyaları
+  Prefabs/        Tekrar kullanılabilir Unity prefab'ları
+  Scenes/         Unity sahneleri
+  Scripts/
+    Core/         Oyun başlangıcı, durum yönetimi, sahne yükleme
+    UI/           Arayüz scriptleri
+Packages/         Unity paket bağımlılıkları
+ProjectSettings/  Unity proje ayarları
+```
+
+## Core Akışı
+
+Başlangıç akışı şu şekilde planlanmıştır:
+
+1. `Boot` sahnesi açılır.
+2. `Bootstrap`, hedef FPS değerini ayarlar.
+3. `GameManager` yoksa oluşturulur ve sahneler arasında kalıcı yapılır.
+4. Oyun durumu `Login` olarak ayarlanır.
+5. `SceneLoader`, `Login` sahnesini yükler.
+
+`SceneId` enum sırası Unity Build Settings sahne sırasıyla aynı tutulmalıdır:
+
+```text
+Boot = 0
+Login = 1
+MainMenu = 2
+Game = 3
+```
+
+## Kurulum
+
+1. Unity Hub kur.
+2. Unity 6 LTS `6000.0.23f1` veya daha yeni bir `6000.0.x` sürümü kur.
+3. Repoyu klonla:
 
    ```bash
    git clone https://github.com/yusufekici24/rush-bank.git
    ```
 
-3. Git kimliğini ayarla (bir kere):
+4. Projeyi Unity Hub üzerinden aç:
 
-   ```bash
-   git config --global user.name "GITHUB_KULLANICI_ADIN"
-   git config --global user.email "GITHUB_EPOSTAN"
+   ```text
+   Add > rush-bank klasörünü seç
    ```
 
-4. Unity Hub → Add → klonladığın `rush-bank` klasörünü seç ve aç.
-5. Kod düzenleme için VS Code kullanılıyorsa aşağıdaki eklentileri kur:
-   - **C# Dev Kit** (Microsoft) — C# dil desteği
-   - **Unity** (Microsoft) — Unity hata ayıklama ve entegrasyon
-   - **GitHub Pull Requests** (GitHub) — PR'ları VS Code içinden aç/yönet
-6. Unity içinde: Edit → Preferences → External Tools → External Script Editor
-   olarak **Visual Studio Code**'u seç. Artık script'e çift tıklayınca VS Code açılır.
+5. VS Code kullanılıyorsa önerilen eklentiler:
 
-> **Not:** `main` branch'i korumalıdır — direkt push GitHub tarafından
-> reddedilir. Tüm işler PR ile gelir ve 1 onay almadan merge edilemez.
+   - C# Dev Kit
+   - Unity
+   - GitHub Pull Requests
+
+6. Unity içinde script editor ayarı:
+
+   ```text
+   Edit > Preferences > External Tools > External Script Editor > Visual Studio Code
+   ```
+
+## Unity Ayarları
+
+Merge sorunlarını azaltmak için Unity içinde şu ayarlar korunmalıdır:
+
+```text
+Edit > Project Settings > Editor > Asset Serialization > Mode > Force Text
+Edit > Project Settings > Editor > Version Control > Mode > Visible Meta Files
+```
+
+`.meta` dosyaları commit edilmelidir. `Library/`, `Temp/`, `Logs/` gibi Unity tarafından üretilen klasörler commit edilmez.
 
 ## Geliştirme Akışı
 
-İki kişilik ekip, GitHub üzerinden PR (Pull Request) akışıyla çalışır:
+Her iş `main` branch'inden yeni branch açılarak yapılır:
 
-1. `main` branch her zaman çalışır durumda tutulur, **direkt push yapılmaz**.
-2. Yeni bir iş için `main`'den branch açılır:
+```bash
+git checkout main
+git pull origin main
+git checkout -b feature/ozellik-adi
+```
 
-   ```bash
-   git checkout main
-   git pull origin main
-   git checkout -b feature/ozellik-adi
-   ```
+İş tamamlanınca commit ve push yapılır:
 
-3. İş bitince push edilip PR açılır:
+```bash
+git status
+git add .
+git commit -m "Kısa ve açıklayıcı commit mesajı"
+git push -u origin feature/ozellik-adi
+```
 
-   ```bash
-   git push -u origin feature/ozellik-adi
-   gh pr create   # veya GitHub web arayüzünden
-   ```
-
-4. PR'ı **Yusuf** inceler ve onaylar; onaysız PR merge edilmez.
-5. Merge sonrası branch silinir (GitHub bunu otomatik yapar).
+Ardından GitHub üzerinden PR açılır. PR Yusuf tarafından incelenir ve onaylandıktan sonra merge edilir.
 
 ## Branch İsimlendirme
 
-- `feature/...` — yeni özellik (ör. `feature/level-sistemi`)
-- `fix/...` — hata düzeltme (ör. `fix/skor-hesabi`)
-- `art/...` — görsel/ses varlıkları
+- `feature/...`: yeni özellik
+- `fix/...`: hata düzeltme
+- `art/...`: görsel veya ses varlıkları
+- `docs/...`: dokümantasyon değişiklikleri
 
-## Unity Ayarları (İLK KURULUMDA ZORUNLU)
+## Geliştirme Notları
 
-Unity projesini bu klasöre oluşturduktan sonra iki ayar mutlaka yapılmalı,
-yoksa git birleştirmeleri (merge) bozulur:
-
-1. **Edit → Project Settings → Editor → Asset Serialization → Mode: Force Text**
-2. **Edit → Project Settings → Editor → Version Control → Mode: Visible Meta Files**
-
-## Dikkat Edilecekler
-
-- `Library/`, `Temp/`, `Logs/` klasörleri commit edilmez (.gitignore hallediyor).
-- `.meta` dosyaları **mutlaka** commit edilir — silme/taşıma işlemlerini Unity içinden yapın.
-- Aynı sahne (`.unity`) üzerinde aynı anda çalışmayın; sahne dosyaları zor birleşir.
-  İş bölümünü sahne/prefab bazında ayırın.
-- Büyük binary dosyalar (100 MB üstü) GitHub'a sığmaz; o noktaya gelirsek Git LFS kurarız.
+- `main` branch'ine direkt push yapılmaz.
+- Aynı `.unity` sahnesinde aynı anda çalışmamaya dikkat edilir.
+- Sahne ve prefab değişiklikleri mümkün olduğunca küçük PR'lara bölünür.
+- Büyük binary dosyalar için gerekirse Git LFS değerlendirilir.
+- İlk oynanabilir hedef: giriş ekranı, temel sahne geçişi ve banka içi 3D prototip akışı.
