@@ -1,6 +1,4 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements">
-    <Style src="../Styles/RushBankTheme.uss" />
-
     <ui:VisualElement class="screen menu-screen">
         <ui:VisualElement class="brand-bar">
             <ui:Label text="RushBank" class="brand-title" />

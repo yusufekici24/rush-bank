@@ -1,4 +1,5 @@
 using RushBank.Core;
+using RushBank.Gameplay;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -8,6 +9,9 @@ namespace RushBank.UI
     public class MainMenuUIController : MonoBehaviour
     {
         [SerializeField] private UIDocument document;
+        [SerializeField] private StyleSheet themeStyleSheet;
+        [SerializeField] private PreLevelPopupController preLevelPopupController;
+        [SerializeField] private LevelDifficultyManager levelDifficultyManager;
 
         private Button startButton;
         private Button scenarioButton;
@@ -24,6 +28,16 @@ namespace RushBank.UI
             {
                 document = GetComponent<UIDocument>();
             }
+
+            if (preLevelPopupController == null)
+            {
+                preLevelPopupController = FindFirstObjectByType<PreLevelPopupController>();
+            }
+
+            if (levelDifficultyManager == null)
+            {
+                levelDifficultyManager = FindFirstObjectByType<LevelDifficultyManager>();
+            }
         }
 
         private void OnEnable()
@@ -31,6 +45,7 @@ namespace RushBank.UI
             AppSettings.Apply();
 
             var root = document.rootVisualElement;
+            ApplyTheme(root);
             startButton = root.Q<Button>("start-button");
             scenarioButton = root.Q<Button>("scenario-button");
             settingsButton = root.Q<Button>("settings-button");
@@ -88,6 +103,14 @@ namespace RushBank.UI
             }
         }
 
+        private void ApplyTheme(VisualElement root)
+        {
+            if (themeStyleSheet != null)
+            {
+                root.styleSheets.Add(themeStyleSheet);
+            }
+        }
+
         private void UnbindEvents()
         {
             if (startButton != null)
@@ -141,6 +164,18 @@ namespace RushBank.UI
 
         private void StartGame()
         {
+            if (levelDifficultyManager != null)
+            {
+                levelDifficultyManager.PlaySelectedBranch();
+                return;
+            }
+
+            if (preLevelPopupController != null)
+            {
+                preLevelPopupController.OpenForLevel((int)SceneId.Game);
+                return;
+            }
+
             if (GameManager.Instance != null)
             {
                 GameManager.Instance.SetState(GameState.InGame);

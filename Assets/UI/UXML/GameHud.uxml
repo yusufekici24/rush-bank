@@ -1,6 +1,4 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements">
-    <Style src="../Styles/RushBankTheme.uss" />
-
     <ui:VisualElement class="screen hud-screen">
         <ui:VisualElement class="top-hud">
             <ui:VisualElement class="hud-pill">

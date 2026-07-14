@@ -42,6 +42,20 @@ RushBank, mobil odaklı 3D banka simülasyonu oyunudur. Oyuncu banka görevlisi 
    - Puan, kalan süre bonusu ve combo multiplier hesaplanır
    - Sıradaki müşteri çağrılır
 
+## Birinci Aşama MVP Son Durum Analizi
+
+İlk aşama için mekanik havuzu tamamlanmış kabul edilir. Prototipin amacı artık yeni sistem eklemekten çok, eldeki sistemleri Unity sahnesinde çalıştırmak, ritimlerini test etmek ve mobil oynanış hissini parlatmaktır.
+
+**Temel İşlemler:** Hesap Cüzdanı hızlı nefes alma görevi olarak, Para Yatırma/Çekme ise orta zorlukta ve kasa kapasitesine bağlı ana işlem olarak MVP'nin çekirdek bankacılık ritmini kurar.
+
+**Ayrışan İşlemler:** Elektrik, Su ve Telefon olmak üzere 3 farklı fatura türü; renk, ikon ve barkod okuyucu feedback'iyle hızlı görsel eşleştirme sağlar.
+
+**Kriz Anları:** Hırsız/Polis zaman dondurma olayı, Telefon çalması refleks testi ve nadir Soygun Baskını gizlilik mini-event'i oyuncunun dikkatini sürekli canlı tutan yüksek tansiyon anlarıdır.
+
+**Stratejik Destekler:** Tembel Yardımcı homurdanma baskısı artınca devreye giren yavaş otomasyon desteğidir. Çaycı Abla hız ve işlem boost'u verir. VIP Müşteri ise Müdür Odasına üçgen rota ile götürülerek hem riskli bir önceliklendirme görevi hem de rahatlama boost'u sağlar.
+
+Bu kapsamla tasarım tarafında açık kalan büyük bir mekanik boşluk yoktur. Bir sonraki odak, bu havuzu daraltılmış MVP sahnesinde çalıştırmak, hangi sistemlerin ilk build'de aktif olacağını seçmek ve oynanış temposunu test etmektir.
+
 ## Temel Oyun Döngüsü
 
 1. Oyun turu başlar.
@@ -52,6 +66,56 @@ RushBank, mobil odaklı 3D banka simülasyonu oyunudur. Oyuncu banka görevlisi 
 6. İşlem bitince skor hesaplanır.
 7. Hedef süreden kalan zaman varsa combo ilerler ve multiplier artar.
 8. Yeni müşteri çağrılır.
+
+## Oyun Döngüsünün Güçlü Yönleri
+
+**Ritim ve Çeşitlilik Dengesi:** Oyuncunun elinde hem mikro saniyelerle yarışacağı hızlı işler (Hesap Cüzdanı, Fatura Ödeme) hem de stratejik koşturmaca gerektiren uzun vadeli yatırımlar (Kredi, Altın, VIP) bulunur. Bu yapı tekdüze oynanışı kırar ve her müşteri gelişinde farklı bir karar temposu yaratır.
+
+**Duygusal İniş Çıkışlar:** Telefonun aniden çalması refleks testi yaratır, soygun baskını gizlilik heyecanı ekler, Çaycı Abla ise tatlı bir rahatlama ve hızlanma anı verir. Oyuncu sadece evrak taşımaz; ritim, panik, rahatlama ve kriz arasında gidip gelir.
+
+**Stratejik Karar Anları:** "Müşteriyi mi bitireyim, telefona mı bakayım?", "Kasayı şimdi mi doldurayım, yoksa uykucu yardımcıyı çağırıp o sırada mı halledeyim?" gibi kararlar oyunu sıradan bir tıklama akışından çıkarıp strateji-aksiyon hissine taşır.
+
+**Mükemmel Senkronizasyon Hissi:** Başarılı oyuncu sadece işleri bitirmez, oyunun temposunu kendi lehine hızlandırır. VIP'yi alıp müdür odasına yetiştirdiğinde gelen `ding!`, `BRAVO!` balonu ve `1.2x` hız boost'u; yolda yakalanan KafeinMode ile birleşirse oyuncu gişeye neredeyse uçarak döner. Bu sırada hızlı fatura tarama, telefon çağrısına yetişme veya tembel yardımcıyı gofretle sahada tutma gibi kararlar peş peşe bağlanır. Ana his şudur: verimli bankacı daha hızlı bankacıdır; iyi oynayan oyuncu kaosu sadece söndürmez, ritmi kendi hızına çeker.
+
+## Meta-Game ve Pre-Run Booster Pazarı
+
+Oyuncunun kazandığı oyun içi para (`PlayerGold`) sadece skor hissi olarak kalmaz; seviye başlamadan önce taktiksel hazırlığa dönüşür. Giriş / seviye seçimi ekranında `Seviye Öncesi Güçlendirici Pazarı` bulunur. Oyuncu tek kullanımlık booster kartları satın alır, run başlamadan en fazla 2 tanesini aktif eder ve seçilen booster'lar seviye başlangıcında tüketilerek uygulanır.
+
+| Booster | Etki | Tontiş Görsel Kimlik |
+| --- | --- | --- |
+| Zaman Bükücü | Ana süre sayacının akış hızını seviye boyunca `0.85x` yapar; süre %15 daha yavaş akar. | Köstekli cep saati veya eriyen tontiş saat |
+| Turbo Tabanlık | Oyuncunun hareket hızını seviye boyunca `1.2x` artırır. | Kanatlı tontiş spor ayakkabı |
+| Homurdanma Önleyici | Tüm müşterilerin sabır/homurdanma düşüş hızını `0.75x` yapar; sabır %25 daha yavaş azalır. | Kulaklık takmış gülen teyze veya papatya çayı |
+
+Teknik olarak `PreGameShopManager`, `PlayerPrefs` üzerinde `PlayerGold`, `Booster_TimeSlow_Qty`, `Booster_Speed_Qty` ve `Booster_Patience_Qty` değerlerini saklar. Shop ekranı `BuyBooster(string boosterType, int cost)` ile satın alma yapar. Level start ekranı `ToggleBoosterForRun(string boosterType, bool equipped)` ile en fazla 2 booster seçtirir. Seviye başında `ApplyActiveBoosters()` çalışır; seçilen booster miktarı 1 azalır, seçim sıfırlanır ve ilgili runtime çarpanı uygulanır.
+
+**Seviye Öncesi Satış Pop-Up'ı:** Oyuncu seviye seçip `Oyna` butonuna bastığında sahne hemen yüklenmez; önce `PreLevelBoosterPopup` paneli açılır. Başlık tonu "Zorlu Bir Gün Seni Bekliyor! Hazırlıklı mısın?" şeklindedir. Panel mevcut `PlayerGold` değerini, 3 booster kartını ve eldeki adetleri gösterir. Kartta stok varsa tıklama doğrudan booster'ı kuşanır; stok yoksa kart `Satın Al & Kuşan` davranışına geçer, yeterli altın varsa satın alır ve anında run için equip eder. En alttaki `Başla` butonu seçili booster durumlarını `GameManager` üzerinde pending run verisi olarak işaretler ve seçilen banka seviyesini yükler. Popup açılırken 0'dan 1'e gelen hafif zıplamalı `EaseOutBack` ölçek animasyonu kullanılır.
+
+## Şube Seçimi ve Zorluk Eğrisi
+
+Oyuncu oyuna girmeden önce çalışacağı şubeyi seçer. Şube seçimi sadece `Easy / Medium / Hard` etiketi değildir; görsel tema, teknoloji seviyesi, müşteri temposu, homurdanma baskısı ve kriz olasılığı birlikte değişir. `LevelDifficultyManager`, seçilen `BranchType` ayarını `GameSettingsManager` singleton'ına yazar; oyun sahnesi yüklenince `QuestSpawner`, `QueueManager`, `TimeManager`, `ThiefEventSystem`, `HeistRaidSystem` ve `ScoreManager` bu ayarı okuyup kendini otomatik ölçekler.
+
+| Şube | Zorluk | Görsel Kimlik | Tempo Ayarları |
+| --- | --- | --- | --- |
+| Taşra Şubesi | Easy | Ahşap mobilyalar, tüplü monitörler, yavaş vantilatör, sıcak kasaba atmosferi | Sabır çarpanı `1.0x`, müşteri geliş aralığı `15s`, hırsız/raid şansı `0.02`, hedef altın `120` |
+| Şehir Şubesi | Medium | Modern ama mütevazı gişeler, LCD ekranlar, standart numaratör ve klima | Sabır çarpanı `1.5x`, müşteri geliş aralığı `8s`, hırsız/raid şansı `0.10`, hedef altın `240` |
+| Metropol Şubesi | Hard | LED ışıklı gişeler, dokunmatik ekranlar, cam gökdelen hissi, ileri teknoloji | Sabır çarpanı `2.2x`, müşteri geliş aralığı `4s`, hırsız/raid şansı `0.25`, hedef altın `420` |
+
+Teknolojik evrim oynanış hissine de yansır: Taşra'da eski yazıcılar ve manuel kaşe gibi yavaş ama sakin işlemler, Metropol'de lazer yazıcı ve dijital imza pedi gibi hızlı cihazlar bulunur. Ancak Metropol'de müşteri yoğunluğu çok yüksek olduğu için bu teknolojik avantaj bile oyuncuya yalnızca nefes alacak kadar alan bırakır.
+
+## Eğitim Şubesi - Soft Opening
+
+Oyuncu ilk kez oyuna girdiğinde resmi şubelerden önce `Eğitim Şubesi`ne alınır. Burası henüz açılmamış, kolileri duran, balonlar ve "Yakında Açılıyoruz!" afişleriyle süslenmiş, tek gişeli sıfır stres alanıdır. Bu bölümde `TimeManager` geri sayımı durdurulur ve müşteri sabrı/homurdanma barları donuktur; oyuncu panik olmadan hareket, etkileşim ve işlem mantığını öğrenir.
+
+`TutorialManager` akışı dört state üzerinden yönetir: `MoveToCounter`, `SimpleTransaction`, `TwoStepTransaction`, `Completed`. İlk adımda oyuncu gişeye yürür ve yerde parlak halka / pointer görür. İkinci adımda tek müşterilik `Passbook Update` benzeri basit işlem öğretilir. Üçüncü adımda zorunlu `Electricity Bill Payment` seçilerek fatura alma, `BarcodeScanner`da tarama ve müşteriye teslim etme akışı gösterilir. Son adımda müdür NPC tebrik mesajı gösterir, `TutorialCompleted = true` ve `Branch_Tasra_Unlocked = true` PlayerPrefs'e yazılır; ardından oyuncu ana seviye seçim ekranına döner ve Taşra Şubesi açılmış olur.
+
+## Fazlı Geliştirme ve Test Planı
+
+**Adım 1 - Temel Çekirdek:** İlk hedef oyunun kalbini çalıştırıp test etmektir. Bu fazda karakter hareketi (`MobilePlayerController` / top-down controller), müşteri sırası (`QueueManager`), zaman sayacı (`TimeManager`) ve sadece iki işlem aktif tutulur: hızlı işlem olarak Hesap Cüzdanı, orta işlem olarak Para Çekme/Yatırma + kasa sistemi. Bu aşamada amaç ana ritmin, koşma mesafelerinin, süre ödüllerinin ve müşteri akışının keyifli olup olmadığını ölçmektir.
+
+**Adım 2 - Kaos ve Çeşitlilik:** Temel döngü tıkır tıkır çalıştıktan sonra çok istasyonlu işler eklenir: Altın Bozdurma, Kredi Onayı ve ardından elektrik/su/telefon varyasyonlu Fatura Ödeme. Bu faz, oyuncunun istasyon okuma, görev önceliklendirme ve görsel ikon eşleştirme becerisini genişletir.
+
+**Adım 3 - Kriz ve Yardımcı Sistemleri:** Ana oynanış oturduktan sonra heyecan sosları açılır: Çaycı Abla, Telefon Kesintisi, Tembel Yardımcı, Hırsız/Polis etkinlikleri ve nadir Heist Raid. Bu sistemler core loop'u bozmayacak şekilde, oyuncunun ustalaştığı ritme sürpriz ve risk katmak için sonradan devreye alınır.
 
 ## Müşteri ve İşlem Tipleri
 
@@ -66,6 +130,143 @@ RushBank, mobil odaklı 3D banka simülasyonu oyunudur. Oyuncu banka görevlisi 
 - Bilgi güncelleme
 
 Her işlem tipi farklı hedef süre, taban puan ve zorluk değerine sahip olabilir.
+
+## Oyun İçi Ekonomi ve Zaman Dengesi
+
+| İşlem Türü | Gerekli İstasyonlar | Zorluk Derecesi | Kazandıracağı Süre |
+| --- | --- | --- | --- |
+| Hesap Cüzdanı | Cüzdan Yazıcısı (Gişe içi) | Çok Kolay | +4 saniye |
+| Fatura Ödeme | Barkod Okuyucu (Gişe içi) | Çok Kolay | +4 saniye |
+| Kart Şifre Blokesi Kaldırma | Mini Terminal (Gişe içi - Mini Game) | Kolay | +5 saniye |
+| Para Çekme/Yatırma | Gişe <-> Ana Kasa (Vault) | Orta | +7 saniye |
+| Döviz Bozdurma | Gişe <-> Kur Çevirici Masası | Orta | +7 saniye |
+| Altın Bozdurma | Gişe -> Ekspertiz Masası -> Gişe | Zor | +10 saniye |
+| Kredi Onayı | Gişe -> İmza -> Müdür Odası -> Gişe | Zor | +12 saniye |
+| VIP Kiralık Kasa | VIP müşteriye kasa odasına kadar eşlik etme | Çok Zor | +15 saniye |
+
+### Görev Havuzu ve Seviye Kilidi
+
+Her gün aynı görevler gelmez. `QuestSpawner`, gün/seviye seviyesine göre aktif `QuestData` listesini ve görev ağırlıklarını kullanır:
+
+- 1. Gün (Eğitim): Hesap Cüzdanı %60, Para Çekme/Yatırma %40.
+- 5. Gün (Kaos): Altın Bozdurma, VIP Kiralık Kasa ve Hırsız gibi zor görevler havuza eklenir; basit görevlerin ağırlığı düşer.
+
+### Dynamic Pacing
+
+Müşteri gelişi sabit değildir:
+
+- Sıra doluluğu: Sırada maksimum 5 kişi varsa yeni müşteri üretimi duraklatılır.
+- Hırsız etkinliği: Hırsız/polis olayı aktifken normal müşteri üretimi durur.
+- Kalan süre baskısı: Süre 15 saniyenin altına düşerse Hesap Cüzdanı, Fatura Ödeme ve Kart Şifre Blokesi gibi quick-win görevlerin ağırlığı artar.
+
+Spawn karar akışı:
+
+```text
+[Spawn zamanı geldi]
+        |
+[Sıra dolu mu?] -- Evet --> [Bekle ve tekrar kontrol et]
+        |
+       Hayır
+        |
+[Hırsız etkinliği aktif mi?] -- Evet --> [Müşteri üretimini durdur]
+        |
+       Hayır
+        |
+[Seviyeye uygun rastgele görev seç]
+        |
+[Rastgele tontiş karakter modeli seç]
+        |
+[Karakteri kapıda spawn et ve sıraya gönder]
+```
+
+### Görsel ve Görev Eşleştirmesi
+
+Sistem önce görev seçer, sonra rastgele yaş/cinsiyet görsel profili seçerek müşteriyi şubeye sokar. Örneğin arka planda Kredi Onayı seçildiğinde müşteri modeli rastgele belirlenir, müşteri kapıdan girer, kafasında kredi/request ikonu belirir ve sıraya katılır.
+
+### Netleşen İşlem Akışları
+
+**Fatura Ödeme:** Müşteri elektrik, su veya telefon faturasıyla gelir. Sistem fatura tipini rastgele seçer ve müşterinin kafasında hızlı okunabilir bir ikon gösterir: elektrik için sarı şimşek, su için mavi damla, telefon için mor/pembe ahize-sinyal işareti. Oyuncu faturayı alır, bankodaki `BarcodeScanner` cihazına götürür ve taratır. Barkod okuyucu elektrik faturasında sarı ışık ve "bzzzt" hissi, su faturasında mavi ışık ve "glug glug" hissi, telefon faturasında mor ışık ve "bip-bip" hissi verir. 0.5 saniyelik işlemden sonra oyuncu işlenmiş faturayı müşteriye geri teslim eder, karakter üstünde tipe özel kıvılcım/baloncuk/sinyal halkası feedback'i oynar ve +4 saniye kazanılır.
+
+| Fatura Türü | İkon Kimliği | Barkod Okuyucu Tepkisi | Tamamlama Efekti |
+| --- | --- | --- | --- |
+| Elektrik Faturası | Sarı şimşek | Sarı ışık patlaması, bzzzt hissi | Küçük sarı kıvılcımlar |
+| Su Faturası | Mavi damla | Mavi ışık patlaması, glug glug hissi | Minik su baloncukları |
+| Telefon Faturası | Mor/pembe ahize-sinyal | Mor ışık patlaması, bip-bip hissi | Mor sinyal halkaları |
+
+**Gelişmiş Fatura Yönetimi / Sorting:** Erken oyunda fatura ödeme bilerek hızlı tutulur: oyuncu faturayı alır, `BarcodeScanner` ile taratır, müşteriye teslim eder ve +4 saniye kazanır. Late game'de bu işlem beceri tavanı oluşturmak için genişletilebilir: gişe arkasına sarı, mavi ve mor olmak üzere 3 fatura kutusu eklenir. Oyuncu taranmış faturayı doğrudan müşteriye vermek yerine doğru renkteki kutuya atar; elektrik sarı kutuya, su mavi kutuya, telefon mor kutuya gitmelidir. Doğru ayrıştırma ödülü korur, yanlış kutu ise süre ödülünü iptal eder veya küçük ceza üretir. Bu özellik ilk prototipte kapalı tutulur; oyuncu ritmi öğrendikten sonra seviye/gün ilerlemesiyle açılacak bir zorluk katmanı olarak planlanır.
+
+**Fatura Difficulty Curve:** Early game'de fatura ödeme "quick win" görevidir ve oyuncuya ritim, renk eşleştirme ve tatminli feedback öğretir. Late game'de sorting/categorization adımı eklenerek oyuncudan aynı anda hız, dikkat ve doğru renk/şekil eşleştirmesi beklenir.
+
+**Döviz Bozdurma:** Müşteri dolar veya euro simgeli yabancı para çuvalıyla gelir. Oyuncu çuvalı alır, gişe arkasındaki Kur Çevirici masasına koyar, cihazın yeşil/mavi ışık veya sembol feedback'ini takip eder ve oluşan yerel para makbuzunu müşteriye teslim eder. Bu işlem orta zorluktadır ve +7 saniye kazandırır.
+
+**VIP Kiralık Kasa Ziyareti:** Çok tontiş ve süslü VIP müşteri büyük anahtar simgesiyle gelir. Oyuncu bankodan çıkar, müşterinin yanına gider, `Action` ile escort başlatır ve VIP müşteri `NavMeshAgent` ile oyuncuyu yakından takip eder. Oyuncu VIP'yi şubenin arkasındaki Kiralık Kasa Odası'na götürür, kasa içinde 2.5 saniyelik bekleme başlar ve ardından VIP müşteriyi çıkış trigger'ına kadar uğurlar. Bu işlem riskli ama yüksek ödüllüdür ve +15 saniye kazandırır.
+
+**VIP Müşteri - Altın Sarısı Sorun:** VIP müşteri sıradan müşteriden hem görsel hem davranışsal olarak ayrılır. Parlak takım elbise, güneş gözlüğü, küçük evrak çantası ve hafif yıldız/parıltı aurası oyuncuya anında "öncelikli kriz" sinyali verir. VIP'nin sabır süresi normal müşteriye göre yaklaşık yarı yarıya kısa tutulur; böylece oyuncu "şu an neyi bırakıp VIP'yi kurtarmalıyım?" kararını hızlı vermek zorunda kalır. VIP ile escort başladığında `QueueManager` kısa süreli bir rahatlama boost'u uygular: aktif/kuyruktaki müşterilerin sabrı toparlanır ve homurdanma hızı geçici olarak yavaşlar. Bu ödül, VIP işini sadece +15 saniyelik bir görev değil, aynı zamanda kriz anını söndüren stratejik bir hamle haline getirir.
+
+**Müdür Odası ve Triangle Route:** VIP escort hedefi sahnede `SafeDepositVault` veya `ManagerRoomDoor` gibi uzak bir trigger'a bağlanabilir. En iyi seviye hissi için giriş kapısı, oyuncu gişesi ve Müdür Odası/Kiralık Kasa kapısı birbirinden uzak ama akıcı bir üçgen rota oluşturmalıdır. Müdür odası girişe çok yakın olmamalı; oyuncu VIP'yi alırken bankosundan uzaklaşmalı, fakat dönüş yolu mobil kontrolde gereksiz zikzak yaratmayacak kadar okunabilir kalmalıdır.
+
+Önerilen VIP rota şeması:
+
+```text
+       [ ŞUBE GİRİŞ KAPISI ] (Müşteriler buradan girer)
+               |
+               | (Müşteri sırayla yürür)
+               v
+       [ VIP MÜŞTERİ SIRASI ]
+               ^
+               | (1. Adım: Oyuncu gişeden çıkıp VIP'yi alır)
+               |
+      [ OYUNCU GİŞESİ ] <------------------------+
+               |                                 |
+               | (2. Adım: VIP ile              | (3. Adım: Hızlıca
+               |  Müdür Odasına yürüyüş)         |  gişeye geri dönüş)
+               v                                 |
+       [ MÜDÜR ODASI ] --------------------------+
+       (Gişeye yakın, girişe uzak)
+```
+
+Prototype sahnede bu akış için VIP bekleme noktası müşteri giriş hattına yakın, Müdür Odası kapısı ise gişeye yakın ama girişe uzak sağ-alt bölgede konumlandırılır. Böylece oyuncu önce gişeden ayrılıp VIP'yi alır, kısa ama stresli bir eskort yürüyüşü yapar ve işi başlatır başlatmaz gişesine hızlıca dönebilecek bir üçgen rota yakalar.
+
+Adım adım üçgen hareket döngüsü:
+
+1. **Kurtarma:** Oyuncu kendi `PlayerCounter` alanından çıkar, sıradaki `VIPWaitingSpot` noktasındaki VIP müşterinin yanına gider ve etkileşim butonuna basar.
+2. **Eşlik Etme:** `StartEscort()` tetiklenir; VIP müşteri `NavMeshAgent` ile oyuncuya bağlanır ve yaklaşık 1.5 metre takip mesafesiyle arkasından gelir. Oyuncu VIP'yi `ManagerRoomEntrance` trigger alanına götürür.
+3. **Rahatlama ve Geri Dönüş:** Oyuncu ve VIP Müdür Odası girişine ulaşınca VIP içeri girer, zengin el sallama animasyonu oynar ve kapı kapanır. Bu anda `ApplyReliefBoost()` tüm bekleyen müşterilerin homurdanma hızını 6 saniyeliğine %50 azaltır; `ApplyPraiseBoost()` ise oyuncuya 5 saniyelik `1.2x` hız boost'u verir. Oyuncu bu fırsatla hızlıca gişesine döner ve normal işlemlere devam eder.
+
+**Müdürden Aferin! Boostu:** VIP müşterinin müdür odasına teslim edildiği ve kapının kapandığı anda oyuncu anında geri bildirim alır. Müdür odası kapısının üstünde tontiş bir `BRAVO!` / `Well Done!` balonu belirir, kısa ve tatmin edici bir `ding!` sesi çalar ve oyuncunun üzerinde sarı-altın bir parıltı efekti patlar. Bu boost `MobilePlayerController` ve top-down controller hız çarpanını `1.2x` olarak 5 saniyeliğine artırır. Hız etkisi KafeinMode ile çarpan mantığıyla üst üste binebilir; şanslı oyuncu aynı anda kahve + müdür övgüsü yakalarsa dönüş koşusunu çok daha akıcı hisseder.
+
+**Kart Şifre Blokesi Kaldırma:** Müşteri bloke olmuş kartını uzatır. Oyuncu kartı alır, gişedeki mini terminale takar ve mini-game açılırken hareketi geçici olarak donar. Ekranda kırmızı, yeşil ve mavi butonlardan oluşan 3 haneli renk sırası gösterilir; oyuncu doğru sırayla dokunursa kart müşteriye geri verilir ve işlem +5 saniye kazandırır. Yanlış girişte pattern sıfırlanır ve kısa bekleme cezasından sonra tekrar denenir.
+
+**İş Arkadaşı Kesintisi:** 45-60 saniyede bir şirin ve tontiş bir banka çalışanı oyuncunun gişe alanına doğrudan girerek sırayı bypass eder. Aktif gişe işlemi duraklatılır; müşteri beklerken sabır barı yaşına göre baskı yemeye devam eder: yaşlı müşteriler 1.5x, orta yaşlılar 1.0x, gençler 0.7x hızla homurdanır. Oyuncu "Acil Ofis Evrakı"nı alıp `ArchiveDesk` alanına teslim eder, +5 saniye kazanır ve ana işlem kaldığı yerden devam eder.
+
+**Müşteri Yaşı ve Sabır Psikolojisi:** Sabır düşüş hızı karakter yaşına göre doğrudan çarpanla hesaplanır: Genç müşteri telefonuna/kulaklığına gömüldüğü için `0.7x`, orta yaşlı müşteri standart `1.0x`, yaşlı müşteri ise çok daha hızlı homurdanarak `1.5x` sabır kaybeder. Kod tarafındaki temel formül `patienceDrain = baseDrainPerSecond * ageMultiplier * temporaryMultiplier` şeklindedir; iş arkadaşı kesintisi gibi özel durumlar sadece `temporaryMultiplier` ile ekstra baskı ekler.
+
+**Merkezden Nakit Talebi:** Oyuncunun gişe kasası sınırlı sayıda para çekme işlemi yapabilir; prototip varsayılanı 5 işlemdir. Oyuncu veya LazyAssistantAI tarafından tamamlanan her para çekme işlemi `currentVaultCash` değerini 1 azaltır. Kasa boşaldığında para çekme işlemi yapılamaz, vault üstünde `NO CASH` uyarısı belirir ve ekranda `Request Cash Dispatch` butonu açılır. Butona basılınca müşterilerin girdiği ana kapının önüne şirin, beyaz, dondurma arabası boyutunda zırhlı nakit aracı gelir. Bu acil görev sırasında aktif müşteri işlemleri duraklar ama müşterilerin sabır barları yaş psikolojisine göre düşmeye devam eder. Oyuncu dışarı çıkıp ağır `Super Cash Bag` çuvalını alır; çuval taşınırken hareket hızı %20 azalır. Çuval kasaya teslim edilince kasa yeniden dolar, vault çevresinde altın nakit patlama efekti oynar ve mevcut para çekme/yatırma ödülünün `1.5x` katı kadar bonus süre kazanılır.
+
+**Telefon Kesintisi:** Her 30-45 saniyede bir küçük köşe bildirimiyle telefon çalar. Oyuncunun 4 saniyelik halka dolum süresi içinde butona basması gerekir. 1 saniyeden hızlı cevap `2.0x`, 1-2.5 saniye arası `1.5x`, 2.5-4 saniye arası `1.1x` süre çarpanı verir. Cevaplanınca `TimeManager` geri sayımı 2 saniyeliğine donar, oyuncu hareket etmeye ve mevcut işini bitirmeye devam eder ama yeni iş çağırma kontrolleri kilitlenir. Komik hızlı konuşma bittikten sonra `basePhoneReward * multiplier` kadar süre eklenir; kaçırılan çağrıda ödül verilmez ve busy-line feedback'i oynar.
+
+**Çaycı Abla / KafeinMode:** Her 50-70 saniyede bir TeaLadyNPC oyuncunun gişesine yakın `TeasideTable` noktasına gelir. Teyze başında tontiş yemeni/eşarp, üzerinde çiçekli önlük ve elinde küçük çay tepsisiyle hafif yalpalayarak yürür; bardağı bırakınca kısa bir el sallama animasyonu oynar ve çıkar. Masaya bırakılan `TeaCup` veya `CoffeeMug` sürekli tüten stylized steam particle ve glow hissiyle tıklanabilir power-up olduğunu belli eder. Oyuncu bardağa doğrudan tıklayınca 8 saniyelik `KafeinMode` başlar: hareket hızı `1.3x` olur, işlem süreleri `0.6x` çarpanla hızlanır, oyuncunun arkasından sarı şimşek/rüzgar çizgileri çıkar ve yumuşak altın overlay ile kalan süre slider'ı görünür. Boost bitince hız, işlem çarpanları ve hız efekti eski haline döner.
+
+**Tembel Yardımcı Atıştırmalık Mekaniği:** Oyuncunun gişe çekmecesinde varsayılan 3 adet snack stoğu olan `SnackDrawer` bulunur. Yardımcı yan gişede çalışırken oyuncu çekmeceden `Tontiş Atıştırmalık` alıp asistana götürebilir. Asistan aktifken ve oyuncu snack taşırken etkileşim yapılırsa snack tüketilir, asistan komik bir yeme/munch animasyonu oynar ve molaya çıkmadan önce yapabileceği görev kapasitesi `+1` artar. Bunun bedeli rehavettir: her snack, asistanın servis süresine `1.2x` yavaşlama cezası ekler. Kafasının üstünde küçük kurabiye/bisküvi göstergesi görünür; oyuncu isterse onu daha uzun süre sahada tutar, ama daha uyuşuk çalışmasını göze alır.
+
+**Nadir Soygun Baskını / Heist Raid:** Oyuncu beyaz zırhlı araçtan aldığı ağır `Super Cash Bag` ile şubeye geri girdiğinde nadiren `%10-15` olasılıkla tontiş maskeli bir hırsız ekibi baskın yapar. Baskın sırasında ana süre donar, ışıklar hafif kararır, oyuncu korku ve ağır çuval etkisiyle `%50` yavaşlar; prototipte diz titreme/korku cue'su görünür. Hırsızlar lobide 2-3 kişi olarak durur, kafalarına yamuk yumuk göz delikli çorap maskesi geçirmiştir ve "ELLER!" tarzı sevimli konuşma cue'larıyla kollarını sallayarak tehdit ederler. 3-4 saniyede bir yön değiştirirler; kafalarındaki göz cue kırmızı/açıkken oyuncuya bakarlar, mavi/kapalıyken arkalarını dönerler. Oyuncu kırmızı görüş alanında hareket eder veya butona basmaya çalışırsa `PlayerSpotted` olur, ünlem feedback'i çıkar, 2 saniye donar ve biraz geri resetlenir. Hırsızlar bakmıyorken gişedeki `Police Alarm Button` noktasına sızıp alarmı basarsa sirenler çalar, polisler içeri dalar; panikleyen hırsızlar çuvallarını havaya fırlatıp ellerini kaldırır, tutuklanır, kasa yeniden dolar ve cash delivery ödülü `2.0x` dev bonusla verilir.
+
+### Cash Flow Balance
+
+Kasa döngüsü oyunu cezalandıran değil, taktik karar aldıran bir sistem olarak dengelenir:
+
+- Para yatırma işlemi başarıyla tamamlandığında `currentVaultCash +1` olur ve değer maksimum kasa kapasitesini aşmaz.
+- Para çekme işlemi başarıyla tamamlandığında `currentVaultCash -1` olur.
+- Kasa sıfıra indiğinde oyuncu dışarı çıkıp zırhlı araçtan nakit almak zorunda kalır; bu sırada gişe boş kalır ve müşteriler homurdanmaya devam eder.
+- Büyük nakit çuvalı geri getirildiğinde risk ödüllendirilir: standart işlem ödülü `1.5x` çarpanla bonus süreye dönüşür.
+
+## Codex Geliştirme Sıralaması
+
+1. `MobilePlayerController`: Dokunmatik hareket, elde obje taşıma ve bırakma.
+2. `TimeManager`: Süre sistemi, bonus süre feedback'i ve zamanı dondurma desteği.
+3. `QueueManager` ve `QuestSpawner`: Tontiş müşterilerin sırayla gelmesi, görev havuzu ve zorluk eğrisi.
+4. `BankingActionSystem` ve `CashDeliverySystem`: Para yatırma/çekme, kasa boşalması, dışarıdan beyaz araçla nakit taşıma.
+5. `StaffInterruptionSystem` ve `LazyAssistantAI`: Araya giren ofis arkadaşları ve çok sıkışınca gelen tembel yardımcı.
 
 ## Teknik Yön
 
