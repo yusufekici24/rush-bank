@@ -182,6 +182,16 @@ namespace RushBank.Gameplay
             }
         }
 
+        public void CancelWorkflow()
+        {
+            if (!IsWorkflowActive)
+            {
+                return;
+            }
+
+            Fail();
+        }
+
         private void HandleCustomerCalled(GameObject customerObject)
         {
             if (customerObject == null || !customerObject.TryGetComponent<QueueCustomer>(out var customer))
@@ -242,6 +252,11 @@ namespace RushBank.Gameplay
             }
 
             var progress = 0f;
+            if (AccountOpeningSystem.TryConsumeQuickBoostCharge())
+            {
+                progress = 1f;
+            }
+
             while (progress < 1f)
             {
                 var duration = Mathf.Max(0.05f, scanProcessingSeconds * actionTimeMultiplier);

@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using RushBank.Core;
 using UnityEngine;
@@ -31,10 +32,16 @@ namespace RushBank.Gameplay
         [SerializeField, Min(1)] private int currentLevel = 1;
         [SerializeField] private List<QuestData> allQuestData = new List<QuestData>
         {
+            new QuestData { questName = "Mobil Bankacilik", spawnProbabilityWeight = 16f, rewardTime = 5f, requestKind = CustomerRequestKind.MobileActivation, unlockLevel = 2, isEasyQuickWin = true },
+            new QuestData { questName = "Para Transferi", spawnProbabilityWeight = 15f, rewardTime = 7f, requestKind = CustomerRequestKind.WireTransfer, unlockLevel = 3, isEasyQuickWin = false },
             new QuestData { questName = "Hesap Cüzdanı", spawnProbabilityWeight = 60f, rewardTime = 4f, requestKind = CustomerRequestKind.PassbookPrinting, unlockLevel = 1, isEasyQuickWin = true },
             new QuestData { questName = "Para Çekme/Yatırma", spawnProbabilityWeight = 40f, rewardTime = 7f, requestKind = CustomerRequestKind.CashWithdrawDeposit, unlockLevel = 1, isEasyQuickWin = false },
             new QuestData { questName = "Fatura Ödeme", spawnProbabilityWeight = 20f, rewardTime = 4f, requestKind = CustomerRequestKind.BillPayment, unlockLevel = 2, isEasyQuickWin = true },
             new QuestData { questName = "Kart Şifre Blokesi", spawnProbabilityWeight = 18f, rewardTime = 5f, requestKind = CustomerRequestKind.CardBlockRemoval, unlockLevel = 3, isEasyQuickWin = true },
+            new QuestData { questName = "Sigorta Yönlendirme", spawnProbabilityWeight = 12f, rewardTime = 0f, requestKind = CustomerRequestKind.InsuranceReferral, unlockLevel = 3, isEasyQuickWin = false },
+            new QuestData { questName = "Barut Müşteri", spawnProbabilityWeight = 6f, rewardTime = 0f, requestKind = CustomerRequestKind.BarutCustomer, unlockLevel = 4, isEasyQuickWin = false },
+            new QuestData { questName = "Dolandirici Musteri", spawnProbabilityWeight = 7f, rewardTime = 0f, requestKind = CustomerRequestKind.ScammerCustomer, unlockLevel = 4, isEasyQuickWin = false },
+            new QuestData { questName = "Bagis ve Yardimlasma", spawnProbabilityWeight = 13f, rewardTime = 0f, requestKind = CustomerRequestKind.PhilanthropistCustomer, unlockLevel = 2, isEasyQuickWin = true },
             new QuestData { questName = "Döviz Bozdurma", spawnProbabilityWeight = 16f, rewardTime = 7f, requestKind = CustomerRequestKind.CurrencyExchange, unlockLevel = 3, isEasyQuickWin = false },
             new QuestData { questName = "Kredi Onayı", spawnProbabilityWeight = 12f, rewardTime = 12f, requestKind = CustomerRequestKind.CreditApproval, unlockLevel = 4, isEasyQuickWin = false },
             new QuestData { questName = "Altın Bozdurma", spawnProbabilityWeight = 12f, rewardTime = 10f, requestKind = CustomerRequestKind.GoldExchange, unlockLevel = 5, isEasyQuickWin = false },
@@ -58,6 +65,9 @@ namespace RushBank.Gameplay
         public UnityEvent OnThiefEventBlockedSpawn = new UnityEvent();
 
         private float spawnTimer;
+        private Coroutine spawnIntervalBoostRoutine;
+        private Vector2 spawnCooldownBeforeBoost;
+        private bool spawnIntervalBoostApplied;
         private bool queueCapacityPauseRaised;
         private bool thiefEventPauseRaised;
 
@@ -167,6 +177,17 @@ namespace RushBank.Gameplay
             }
 
             ApplyBranchSettings(GameSettingsManager.Instance.CurrentBranchSettings);
+        }
+
+        public void ApplySpawnIntervalMultiplierForSeconds(float multiplier, float seconds)
+        {
+            if (spawnIntervalBoostRoutine != null)
+            {
+                StopCoroutine(spawnIntervalBoostRoutine);
+                RestoreSpawnIntervalBoost();
+            }
+
+            spawnIntervalBoostRoutine = StartCoroutine(SpawnIntervalMultiplierRoutine(multiplier, seconds));
         }
 
         public void RefreshUnlockedQuests()
@@ -393,6 +414,31 @@ namespace RushBank.Gameplay
             }
 
             spawnTimer = Mathf.Max(0.5f, cooldown);
+        }
+
+        private IEnumerator SpawnIntervalMultiplierRoutine(float multiplier, float seconds)
+        {
+            multiplier = Mathf.Max(0.1f, multiplier);
+            spawnCooldownBeforeBoost = spawnCooldown;
+            spawnIntervalBoostApplied = true;
+            spawnCooldown *= multiplier;
+            spawnTimer *= multiplier;
+
+            yield return new WaitForSeconds(Mathf.Max(0f, seconds));
+
+            RestoreSpawnIntervalBoost();
+            spawnIntervalBoostRoutine = null;
+        }
+
+        private void RestoreSpawnIntervalBoost()
+        {
+            if (!spawnIntervalBoostApplied)
+            {
+                return;
+            }
+
+            spawnCooldown = spawnCooldownBeforeBoost;
+            spawnIntervalBoostApplied = false;
         }
 
         private Vector3 GetSpawnPosition()

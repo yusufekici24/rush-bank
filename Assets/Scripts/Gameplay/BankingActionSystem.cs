@@ -250,6 +250,14 @@ namespace RushBank.Gameplay
             }
         }
 
+        public void CancelAction()
+        {
+            DestroyHeldItem();
+            currentStep = ActionStep.None;
+            detectedCustomer = null;
+            OnActionFailed.Invoke(activeActionType);
+        }
+
         private void CompleteAction()
         {
             currentStep = ActionStep.None;

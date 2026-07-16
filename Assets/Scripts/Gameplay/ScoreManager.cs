@@ -1,3 +1,4 @@
+using System.Collections;
 using RushBank.Core;
 using UnityEngine;
 
@@ -18,6 +19,7 @@ namespace RushBank.Gameplay
         public float CurrentMultiplier { get; private set; } = 1f;
         public int RunGoldEarned { get; private set; }
         public int TargetGoldToWin => targetGoldToWin;
+        public static float GoldMultiplier { get; private set; } = 1f;
 
         public IntEvent OnScoreChanged = new IntEvent();
         public IntEvent OnComboChanged = new IntEvent();
@@ -27,6 +29,7 @@ namespace RushBank.Gameplay
         public UnityEngine.Events.UnityEvent OnTargetGoldReached = new UnityEngine.Events.UnityEvent();
 
         private bool targetGoldReached;
+        private Coroutine goldMultiplierRoutine;
 
         private void Awake()
         {
@@ -50,6 +53,17 @@ namespace RushBank.Gameplay
             TotalScore += points;
             AwardGoldFromScore(points);
             OnPointsAwarded?.Invoke(points);
+            OnScoreChanged?.Invoke(TotalScore);
+        }
+
+        public void SubtractScore(int points)
+        {
+            if (points <= 0)
+            {
+                return;
+            }
+
+            TotalScore = Mathf.Max(0, TotalScore - points);
             OnScoreChanged?.Invoke(TotalScore);
         }
 
@@ -82,11 +96,28 @@ namespace RushBank.Gameplay
             CurrentMultiplier = 1f;
             RunGoldEarned = 0;
             targetGoldReached = false;
+            GoldMultiplier = 1f;
+
+            if (goldMultiplierRoutine != null)
+            {
+                StopCoroutine(goldMultiplierRoutine);
+                goldMultiplierRoutine = null;
+            }
 
             OnScoreChanged?.Invoke(TotalScore);
             OnComboChanged?.Invoke(ComboCount);
             OnMultiplierChanged?.Invoke(CurrentMultiplier);
             OnRunGoldChanged?.Invoke(RunGoldEarned);
+        }
+
+        public void ApplyGoldMultiplierForSeconds(float multiplier, float seconds)
+        {
+            if (goldMultiplierRoutine != null)
+            {
+                StopCoroutine(goldMultiplierRoutine);
+            }
+
+            goldMultiplierRoutine = StartCoroutine(GoldMultiplierRoutine(multiplier, seconds));
         }
 
         public void ApplyBranchSettings(BranchSettings settings)
@@ -130,7 +161,8 @@ namespace RushBank.Gameplay
             }
 
             var bonusGold = Mathf.FloorToInt(awardedScore / (float)scorePerExtraGold);
-            var earnedGold = goldPerCompletedTransaction + bonusGold;
+            var baseEarnedGold = goldPerCompletedTransaction + bonusGold;
+            var earnedGold = Mathf.Max(0, Mathf.CeilToInt(baseEarnedGold * GoldMultiplier));
             RunGoldEarned += earnedGold;
             var currentGold = PlayerPrefs.GetInt(PreGameShopManager.PlayerGoldKey, 0);
             PlayerPrefs.SetInt(PreGameShopManager.PlayerGoldKey, currentGold + earnedGold);
@@ -142,6 +174,14 @@ namespace RushBank.Gameplay
                 targetGoldReached = true;
                 OnTargetGoldReached.Invoke();
             }
+        }
+
+        private IEnumerator GoldMultiplierRoutine(float multiplier, float seconds)
+        {
+            GoldMultiplier = Mathf.Max(0f, multiplier);
+            yield return new WaitForSeconds(Mathf.Max(0f, seconds));
+            GoldMultiplier = 1f;
+            goldMultiplierRoutine = null;
         }
     }
 }

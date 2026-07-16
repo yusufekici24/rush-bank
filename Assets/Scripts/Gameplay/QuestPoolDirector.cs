@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using RushBank.Core;
 using UnityEngine;
@@ -26,10 +27,16 @@ namespace RushBank.Gameplay
         [SerializeField, Min(1)] private int chaosDay = 5;
         [SerializeField] private List<QuestPoolEntry> questPool = new List<QuestPoolEntry>
         {
+            new QuestPoolEntry { requestKind = CustomerRequestKind.WireTransfer, dayOneWeight = 0f, dayFiveWeight = 11f, quickWin = false, unlockDay = 3 },
             new QuestPoolEntry { requestKind = CustomerRequestKind.PassbookPrinting, dayOneWeight = 60f, dayFiveWeight = 14f, quickWin = true, unlockDay = 1 },
             new QuestPoolEntry { requestKind = CustomerRequestKind.CashWithdrawDeposit, dayOneWeight = 40f, dayFiveWeight = 16f, quickWin = false, unlockDay = 1 },
             new QuestPoolEntry { requestKind = CustomerRequestKind.BillPayment, dayOneWeight = 0f, dayFiveWeight = 14f, quickWin = true, unlockDay = 2 },
+            new QuestPoolEntry { requestKind = CustomerRequestKind.MobileActivation, dayOneWeight = 0f, dayFiveWeight = 13f, quickWin = true, unlockDay = 2 },
+            new QuestPoolEntry { requestKind = CustomerRequestKind.PhilanthropistCustomer, dayOneWeight = 0f, dayFiveWeight = 12f, quickWin = true, unlockDay = 2 },
             new QuestPoolEntry { requestKind = CustomerRequestKind.CardBlockRemoval, dayOneWeight = 0f, dayFiveWeight = 10f, quickWin = true, unlockDay = 3 },
+            new QuestPoolEntry { requestKind = CustomerRequestKind.InsuranceReferral, dayOneWeight = 0f, dayFiveWeight = 9f, quickWin = false, unlockDay = 3 },
+            new QuestPoolEntry { requestKind = CustomerRequestKind.BarutCustomer, dayOneWeight = 0f, dayFiveWeight = 6f, quickWin = false, unlockDay = 4 },
+            new QuestPoolEntry { requestKind = CustomerRequestKind.ScammerCustomer, dayOneWeight = 0f, dayFiveWeight = 6f, quickWin = false, unlockDay = 4 },
             new QuestPoolEntry { requestKind = CustomerRequestKind.CurrencyExchange, dayOneWeight = 0f, dayFiveWeight = 12f, quickWin = false, unlockDay = 3 },
             new QuestPoolEntry { requestKind = CustomerRequestKind.GoldExchange, dayOneWeight = 0f, dayFiveWeight = 12f, quickWin = false, unlockDay = 5 },
             new QuestPoolEntry { requestKind = CustomerRequestKind.CreditApproval, dayOneWeight = 0f, dayFiveWeight = 10f, quickWin = false, unlockDay = 4 },
@@ -49,6 +56,10 @@ namespace RushBank.Gameplay
         public UnityEvent OnThiefEventSpawnPaused = new UnityEvent();
 
         private float nextSpawnTimer;
+        private Coroutine spawnIntervalBoostRoutine;
+        private float baseArrivalIntervalBeforeBoost;
+        private float arrivalVarianceBeforeBoost;
+        private bool spawnIntervalBoostApplied;
 
         public int CurrentDay => currentDay;
         public int MaxQueueSize => maxQueueSize;
@@ -121,6 +132,17 @@ namespace RushBank.Gameplay
             OnQuestSpawned.Invoke(requestKind);
         }
 
+        public void ApplySpawnIntervalMultiplierForSeconds(float multiplier, float seconds)
+        {
+            if (spawnIntervalBoostRoutine != null)
+            {
+                StopCoroutine(spawnIntervalBoostRoutine);
+                RestoreSpawnIntervalBoost();
+            }
+
+            spawnIntervalBoostRoutine = StartCoroutine(SpawnIntervalMultiplierRoutine(multiplier, seconds));
+        }
+
         private CustomerRequestKind PickRequestKind()
         {
             var totalWeight = 0f;
@@ -183,6 +205,34 @@ namespace RushBank.Gameplay
                 : Random.Range(-arrivalIntervalVarianceSeconds, arrivalIntervalVarianceSeconds);
 
             nextSpawnTimer = Mathf.Max(0.5f, baseArrivalIntervalSeconds + variance);
+        }
+
+        private IEnumerator SpawnIntervalMultiplierRoutine(float multiplier, float seconds)
+        {
+            multiplier = Mathf.Max(0.1f, multiplier);
+            baseArrivalIntervalBeforeBoost = baseArrivalIntervalSeconds;
+            arrivalVarianceBeforeBoost = arrivalIntervalVarianceSeconds;
+            spawnIntervalBoostApplied = true;
+            baseArrivalIntervalSeconds *= multiplier;
+            arrivalIntervalVarianceSeconds *= multiplier;
+            nextSpawnTimer *= multiplier;
+
+            yield return new WaitForSeconds(Mathf.Max(0f, seconds));
+
+            RestoreSpawnIntervalBoost();
+            spawnIntervalBoostRoutine = null;
+        }
+
+        private void RestoreSpawnIntervalBoost()
+        {
+            if (!spawnIntervalBoostApplied)
+            {
+                return;
+            }
+
+            baseArrivalIntervalSeconds = baseArrivalIntervalBeforeBoost;
+            arrivalIntervalVarianceSeconds = arrivalVarianceBeforeBoost;
+            spawnIntervalBoostApplied = false;
         }
     }
 }

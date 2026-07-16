@@ -54,8 +54,14 @@ namespace RushBank.Gameplay
         private int inputIndex;
         private bool acceptingInput;
         private bool isRunning;
+        private float actionTimeMultiplier = 1f;
 
         public bool IsRunning => isRunning;
+        public float ActionTimeMultiplier
+        {
+            get => actionTimeMultiplier;
+            set => actionTimeMultiplier = Mathf.Max(0.05f, value);
+        }
 
         private void Awake()
         {
@@ -102,6 +108,13 @@ namespace RushBank.Gameplay
             }
 
             isRunning = true;
+            if (AccountOpeningSystem.TryConsumeQuickBoostCharge())
+            {
+                OnMiniGameStarted.Invoke();
+                HandleSuccess();
+                return;
+            }
+
             FreezePlayer(true);
             EnsureOverlay();
             overlayRoot.SetActive(true);
@@ -154,9 +167,9 @@ namespace RushBank.Gameplay
             {
                 var index = (int)sequence[i];
                 SetButtonHighlighted(index, true);
-                yield return new WaitForSeconds(flashSeconds);
+                yield return new WaitForSeconds(flashSeconds * actionTimeMultiplier);
                 SetButtonHighlighted(index, false);
-                yield return new WaitForSeconds(flashGapSeconds);
+                yield return new WaitForSeconds(flashGapSeconds * actionTimeMultiplier);
             }
         }
 
@@ -194,7 +207,7 @@ namespace RushBank.Gameplay
                 TimeManager.Instance.SubtractTime(failTimePenaltySeconds);
             }
 
-            yield return new WaitForSeconds(retryDelaySeconds);
+            yield return new WaitForSeconds(retryDelaySeconds * actionTimeMultiplier);
             gameRoutine = StartCoroutine(RunRound());
         }
 

@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using RushBank.Core;
@@ -88,6 +89,8 @@ namespace RushBank.Gameplay
 
         public UnityEvent<BranchSettings> OnBranchSelected = new UnityEvent<BranchSettings>();
 
+        private Coroutine temporarySpawnIntervalRoutine;
+
         public BranchType SelectedBranch => selectedBranch;
         public BranchSettings SelectedSettings => GetSettings(selectedBranch);
 
@@ -161,6 +164,18 @@ namespace RushBank.Gameplay
             PlaySelectedBranch();
         }
 
+        public void ApplyTemporarySpawnIntervalMultiplier(float multiplier, float seconds)
+        {
+            if (temporarySpawnIntervalRoutine != null)
+            {
+                StopCoroutine(temporarySpawnIntervalRoutine);
+                temporarySpawnIntervalRoutine = null;
+                OnBranchSelected.Invoke(SelectedSettings.WithClampedValues());
+            }
+
+            temporarySpawnIntervalRoutine = StartCoroutine(TemporarySpawnIntervalRoutine(multiplier, seconds));
+        }
+
         private BranchSettings GetSettings(BranchType branchType)
         {
             for (var i = 0; i < branchSettings.Count; i++)
@@ -172,6 +187,18 @@ namespace RushBank.Gameplay
             }
 
             return BranchSettings.CreateDefault(branchType);
+        }
+
+        private IEnumerator TemporarySpawnIntervalRoutine(float multiplier, float seconds)
+        {
+            var settings = SelectedSettings.WithClampedValues();
+            settings.customerSpawnInterval *= Mathf.Max(0.1f, multiplier);
+            OnBranchSelected.Invoke(settings);
+
+            yield return new WaitForSeconds(Mathf.Max(0f, seconds));
+
+            OnBranchSelected.Invoke(SelectedSettings.WithClampedValues());
+            temporarySpawnIntervalRoutine = null;
         }
 
         private static int GetBuildIndex(string sceneName)

@@ -107,6 +107,26 @@ namespace RushBank.Gameplay
             }
         }
 
+        public void CancelWorkflow()
+        {
+            if (evaluationRoutine != null)
+            {
+                StopCoroutine(evaluationRoutine);
+                evaluationRoutine = null;
+            }
+
+            DestroyHeldItem();
+            SetProgress(evaluationProgressBar, 0f, false);
+            if (evaluationScaleVisual != null)
+            {
+                evaluationScaleVisual.SetActive(false);
+            }
+
+            workflowActive = false;
+            SetState(GoldExchangeState.ReceiveGold);
+            OnGoldExchangeFailed.Invoke();
+        }
+
         private void TryReceiveGold()
         {
             if (!IsAtStation(counterTag) || holdPoint == null || heldItem != null)

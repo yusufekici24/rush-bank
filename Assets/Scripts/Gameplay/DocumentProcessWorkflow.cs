@@ -120,6 +120,33 @@ namespace RushBank.Gameplay
             }
         }
 
+        public void CancelWorkflow()
+        {
+            if (activeRoutine != null)
+            {
+                StopCoroutine(activeRoutine);
+                activeRoutine = null;
+            }
+
+            DestroyHeldDocument();
+            SetProgress(signatureProgressBar, 0f, false);
+            SetProgress(managerApprovalProgressBar, 0f, false);
+
+            if (penScribbleEffect != null)
+            {
+                penScribbleEffect.SetActive(false);
+            }
+
+            if (managerStampEffect != null)
+            {
+                managerStampEffect.SetActive(false);
+            }
+
+            workflowActive = false;
+            SetState(DocumentProcessState.RequestForm);
+            OnWorkflowFailed.Invoke();
+        }
+
         private void TryGrabBlankForm()
         {
             if (!IsAtStation(documentDeskTag) || holdPoint == null || heldDocument != null)
