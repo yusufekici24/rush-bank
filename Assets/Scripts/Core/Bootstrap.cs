@@ -18,6 +18,8 @@ namespace RushBank.Core
                 go.AddComponent<GameManager>();
             }
 
+            GameSettingsManager.EnsureInstance();
+
             GameManager.Instance.SetState(GameState.Login);
             SceneLoader.Load(SceneId.Login);
         }

@@ -19,6 +19,11 @@ namespace RushBank.Gameplay
     }
 
     [Serializable]
+    public class BoolEvent : UnityEvent<bool>
+    {
+    }
+
+    [Serializable]
     public class BankCustomerEvent : UnityEvent<BankCustomer>
     {
     }

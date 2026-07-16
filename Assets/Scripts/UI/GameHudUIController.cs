@@ -8,6 +8,7 @@ namespace RushBank.UI
     public class GameHudUIController : MonoBehaviour
     {
         [SerializeField] private UIDocument document;
+        [SerializeField] private StyleSheet themeStyleSheet;
         [SerializeField] private ScoreManager scoreManager;
         [SerializeField] private TellerServiceController tellerService;
 
@@ -32,6 +33,7 @@ namespace RushBank.UI
         private void OnEnable()
         {
             var root = document.rootVisualElement;
+            ApplyTheme(root);
             scoreLabel = root.Q<Label>("score-label");
             comboLabel = root.Q<Label>("combo-label");
             multiplierLabel = root.Q<Label>("multiplier-label");
@@ -78,6 +80,14 @@ namespace RushBank.UI
             if (callNextButton != null)
             {
                 callNextButton.clicked += CallNextCustomer;
+            }
+        }
+
+        private void ApplyTheme(VisualElement root)
+        {
+            if (themeStyleSheet != null)
+            {
+                root.styleSheets.Add(themeStyleSheet);
             }
         }
 

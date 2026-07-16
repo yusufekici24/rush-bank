@@ -16,6 +16,10 @@ Bu dosya, Unity prototipi için bilinen isterleri, eksikleri ve önerilen geliş
 - Kalan süreye göre combo bonusu ve multiplier kazanılacak.
 - Repo PR akışıyla geliştirilecek; Yusuf onaylamadan merge yapılmayacak.
 - İlk akışta giriş ekranı ve içeri girdikten sonra senaryo sistemi olacak.
+- Birinci aşama MVP mekanik havuzu tasarım olarak tamamlandı: temel işlemler, fatura varyasyonları, kriz anları ve stratejik destekler netleşti.
+- Sıradaki ana odak yeni mekanik eklemek değil; Unity sahnesinde daraltılmış MVP akışını çalıştırmak, test etmek ve ritim/denge ayarı yapmak.
+- Game feel hedefi netleşti: başarılı oyuncu VIP, KafeinMode, telefon, fatura ve tembel yardımcı kararlarını senkronize ederek oyunun temposunu kendi lehine hızlandırabilmeli.
+- Meta-game hedefi eklendi: oyuncu `PlayerGold` ile seviye öncesi tek kullanımlık booster satın alıp run başlamadan en fazla 2 güçlendirici seçebilmeli.
 
 ## Eksikler
 
@@ -25,6 +29,40 @@ Bu dosya, Unity prototipi için bilinen isterleri, eksikleri ve önerilen geliş
 - MainMenu UI yok.
 - Banka içi 3D ortam yok.
 - Mobil kontrol sistemi yok.
+- New Input System destekli Rigidbody top-down chubby karakter controller eklendi; mobil joystick UI bağlantısı kaldı.
+- MobilePlayerController eklendi; Virtual Joystick, Grab/Deposit action ve HoldPoint item taşıma akışı hazır.
+- PlayerInteraction eklendi; trigger ile interactable nesne algılama, tutma ve fırlatma hazır.
+- DeliveryPoint eklendi; doğru item ID/renk kontrolü, teslim, +süre ödülü ve görsel feedback hazır.
+- QueueManager eklendi; müşteri kuyruğu, bekleme alanı, gişeye çağırma, request icon ve patience bar temeli hazır.
+- BankingActionSystem eklendi; Withdraw, Deposit ve CurrencyExchange akışları için vault/counter görev sistemi hazır.
+- DocumentProcessWorkflow eklendi; kredi/kart başvuru formu, müşteri imzası, manager onayı ve teslim akışı hazır.
+- GoldExchangeWorkflow eklendi; Gold Bag/Gold Bar, ExpertiseStation değerlendirme, Value Receipt ve sparkle ödül akışı hazır.
+- FastTrackActionSystem eklendi; Passbook Printing ve Card Activation gibi hızlı/no-approval görevler hazır.
+- UtilityBillSystem eklendi; Elektrik/Su/Telefon fatura tipleri, müşteri üstü renkli ikon bubble, BarcodeScanner renk/ses feedback'i, 0.5 saniye scan ve +4 saniye teslim ödülü hazır.
+- Gelişmiş Fatura Yönetimi planlandı; late game'de sarı/mavi/mor fatura kutuları, doğru renge ayırma, yanlış kutuda ödül iptali veya ceza üreten sorting/categorization mekaniği eklenecek.
+- UIManager eklendi; Call Customer cooldown, CustomerRequest icon ve TimeRemaining slider temeli hazır.
+- CustomerPatience ve SecuritySystem eklendi; grumpy/raging müşteri durumları ve güvenlik çağırma akışı hazır.
+- CustomerPatience ve QueueCustomer yaş psikolojisi çarpanları eklendi; genç 0.7x, orta yaşlı 1.0x, yaşlı 1.5x sabır düşüş hızına sahip.
+- ThiefEventSystem eklendi; thief spawn, Call Police, TimeManager freeze ve polis escort akışı hazır.
+- LazyAssistantAI eklendi; ikinci gişede sıradaki müşteriyi yavaş servis eden geçici yardımcı akışı hazır.
+- LazyAssistantAI atıştırmalık mekaniği eklendi; oyuncu `SnackDrawer`dan snack alıp asistana yedirerek görev kapasitesini +1 artırabilir, her snack asistan servis süresini 1.2x yavaşlatır ve kurabiye göstergesi açar.
+- AssistantManager eklendi; kuyruk grumpiness oranına göre dolan SummonBar ve cooldown akışı hazır.
+- BankTransaction ScriptableObject eklendi; 8 işlem türü için istasyon, zorluk ve süre ödülü presetleri setup aracıyla üretilecek.
+- Fatura Ödeme, Döviz Bozdurma, VIP Kiralık Kasa ve Kart Şifre Blokesi için adım adım oynanış akışları BankTransaction verisine işlendi.
+- VIPEscortSystem eklendi; VIP müşteriyi NavMeshAgent ile kasaya götürme, 2.5 saniye bekletme, çıkışa uğurlama ve +15 saniye ödül akışı hazır.
+- VIPCustomer eklendi; VIP müşteriye parıltı/aura hook'u, daha kısa sabır süresi ve escort başlayınca kuyruk rahatlatma boost'u hazır.
+- VIP için Müdür Odası / Kiralık Kasa hedefi üçgen rota mantığıyla yerleştirildi: VIP sırası giriş hattına yakın, oyuncu gişesi orta/alt hatta, Müdür Odası kapısı gişeye yakın ama girişe uzak sağ-alt bölgede.
+- VIPEscortSystem üçgen rota akışına güncellendi; `PlayerCounter`, `VIPWaitingSpot`, `ManagerRoomEntrance` key transform'ları, 1.5m NavMeshAgent takip mesafesi, müdür odasında 6 saniye %50 homurdanma yavaşlatma ve oyuncuya 1.2x hız boost'u hazır.
+- Müdürden Aferin boost'u eklendi; VIP tesliminde ding sesi, `BRAVO!` balonu, oyuncuda altın parıltı ve KafeinMode ile çarpan olarak stacklenen 5 saniyelik 1.2x hız artışı hazır.
+- CardBlockMiniGame eklendi; oyuncuyu geçici donduran, 3 renkli pattern gösteren, doğru girişte +5 saniye veren kart blokesi mini-game akışı hazır.
+- QuestPoolDirector eklendi; gün bazlı görev ağırlıkları, maksimum 5 kişilik sıra doluluğu kontrolü, hırsız aktifken spawn durdurma ve kritik sürede quick-win görev boost'u hazır.
+- QuestSpawner eklendi; QuestData struct, aktif seviye görev listesi, 5-8 saniye random spawn, max queue capacity, hırsız aktifken spawn durdurma, kritik sürede cooldown azaltma ve quick-win ağırlık boost'u hazır.
+- StaffInterruptionSystem eklendi; rastgele iş arkadaşı kesintisi, aktif gişe işlemini pause/resume event'leriyle duraklatma, yaşa göre sabır baskısı ve ArchiveDesk evrak teslimi hazır.
+- CashDeliverySystem eklendi; 5 işlem kapasiteli `currentVaultCash`, Request Cash Dispatch butonu, vault `NO CASH` uyarısı, zırhlı araç spawn'ı, %20 yavaşlatan Super Cash Bag teslimi, golden cash explosion ve 1.5x bonus süre akışı hazır.
+- Cash flow dengesi eklendi; başarılı Deposit işlemleri kasayı +1 doldurur, Withdrawal işlemleri kasayı -1 azaltır.
+- PhoneInterruptionSystem eklendi; 30-45 saniye random telefon çalma, 4 saniyelik cevap penceresi, reaction-time çarpanı, 2 saniye time freeze ve kaçırılan çağrı cooldown akışı hazır.
+- TeaLadyBoostSystem eklendi; 50-70 saniye TeaLadyNPC spawn, yemeni/önlük/tepsi fallback teyze görseli, yalpalama ve el sallama hissi, TeasideTable'a steam/glow TeaCup bırakma, tıklanınca 8 saniye KafeinMode, +30% hız, sarı hız izi ve 0.6x işlem süresi çarpanı hazır.
+- HeistRaidSystem eklendi; Super Cash Bag ile şubeye girince %10-15 nadir soygun roll'u, yamuk çorap maskeli 2-3 hırsız, konuşma/el sallama cue'ları, kırmızı/mavi göz cue, oyuncu diz titreme korku efekti, %50 yavaşlama, yakalanınca 2 saniye freeze cezası, alarm butonu, polis gelince çuval fırlatma ve tutuklama akışı hazır.
 - Kamera sistemi yok.
 - Etkileşim sistemi sahneye bağlanmadı.
 - Senaryo verileri yok.
@@ -33,23 +71,44 @@ Bu dosya, Unity prototipi için bilinen isterleri, eksikleri ve önerilen geliş
 - Müşteri kuyruk sistemi sahneye bağlanmadı.
 - Skor, combo ve multiplier UI'ı yok.
 - Modern ama basit UI Toolkit temeli oluşturuldu; sahnelere bağlanması gerekiyor.
+- Prototype scene setup aracı eklendi; Unity içinde `RushBank > Setup Prototype Scenes` ile sahneler ve örnek veriler oluşturulacak.
+- TimeManager eklendi; 60 saniyelik geri sayım, süre ekleme/çıkarma ve game over event'i hazır.
+- PreGameShopManager eklendi; `PlayerGold`, TimeSlow/Speed/Patience booster stokları, satın alma, run öncesi en fazla 2 booster seçme ve level başlangıcında booster tüketip uygulama akışı hazır.
+- Pre-run booster etkileri eklendi; Zaman Bükücü süre akışını 0.85x, Turbo Tabanlık oyuncu hızını 1.2x, Homurdanma Önleyici global sabır düşüşünü 0.75x yapar.
+- PreLevelPopupController eklendi; seviye `Oyna` butonuna basılınca sahneyi hemen yüklemek yerine booster satış pop-up'ı açar, PlayerGold/adetleri gösterir, hızlı satın al & kuşan akışını yönetir ve `Başla` ile seçili seviyeyi yükler.
+- LevelDifficultyManager ve GameSettingsManager eklendi; Taşra/Şehir/Metropol branch seçimi PlayerPrefs'e kaydedilir, seçilen branch ayarları oyun sahnesinde spawn aralığı, sabır baskısı, hırsız/raid şansı ve hedef altın değerlerini otomatik ölçekler.
+- TutorialManager eklendi; Eğitim Şubesi soft opening akışı, süre/sabır baskısını kapatma, gişeye yürüme, Passbook Update, Electricity Bill Payment ve tamamlanınca Taşra kilidi açma hazır.
+- Chubby Toon URP shader ve kullanım rehberi eklendi; URP pipeline kurulumu yapılacak.
 - İlk oynanabilir gişe görevi tanımlanmadı.
 - Görsel stil ve kurgusal banka isimleri netleşmedi.
 - Android build/test ayarı yapılmadı.
 
 ## Önerilen Geliştirme Sırası
 
+0. Çalıştır ve test et: temel çekirdek
+   - Önce `TutorialManager` ile Eğitim Şubesi onboarding akışını test et
+   - Karakter hareketini test et
+   - `QueueManager` ile müşteri çağırma akışını test et
+   - `TimeManager` geri sayım ve süre ekleme davranışını test et
+   - Sadece iki işlem açık kalsın: Hesap Cüzdanı ve Para Çekme/Yatırma + kasa sistemi
+   - Amaç: ana ritim, koşma mesafesi, süre ödülü ve kasa döngüsü eğlenceli mi?
+
 1. Sahne iskeleti
+   - Editor setup aracı hazırlandı
    - `Boot`
    - `Login`
    - `MainMenu`
    - `Game`
+   - Build Settings sırası setup aracıyla oluşturulacak
 
 2. UI prototipi
    - Ana menü UXML/USS hazırlandı
    - Ayarlar paneli hazırlandı
    - Ses ve titreşim toggle'ları hazırlandı
    - Oyun içi HUD hazırlandı
+   - UIManager ile Call Customer butonu ve süre slider'ı eklendi
+   - Pre-run shop ekranı eklendi: PlayerGold göstergesi, booster satın alma kartları, level start booster toggle'ları ve EaseOutBack popup animasyonu
+   - Level selection akışı eklendi: Taşra Şubesi Easy, Şehir Şubesi Medium, Metropol Şubesi Hard branch ayarları `GameSettingsManager` üzerinden run'a aktarılır
    - Sahneye UIDocument olarak bağlanacak
 
 3. 3D prototip sahnesi
@@ -57,9 +116,15 @@ Bu dosya, Unity prototipi için bilinen isterleri, eksikleri ve önerilen geliş
    - Gişe
    - Sıra makinesi
    - Bekleme alanı
+   - Chubby Toon URP shader test materyali
 
 4. Oyuncu sistemi
-   - Mobil joystick veya basit touch kontrol
+   - New Input System destekli Rigidbody top-down chubby hareket controller'ı eklendi
+   - MobilePlayerController ile UI butonlu Grab/Deposit akışı eklendi
+   - Basit screen joystick scripti eklendi
+   - PlayerInteraction ile nesne taşıma/fırlatma eklendi
+   - DeliveryPoint ile doğru objeyi teslim etme eklendi
+   - Mobil joystick UI prefab/sahne bağlantısı yapılacak
    - Kamera takibi
    - Etkileşim mesafesi
 
@@ -73,6 +138,27 @@ Bu dosya, Unity prototipi için bilinen isterleri, eksikleri ve önerilen geliş
    - Müşteri tipi modeli
    - İşlem isteği modeli
    - Müşteri kuyruk yöneticisi
+   - QueueManager ile bekleme alanı ve gişeye çağırma eklendi
+   - BankingActionSystem ile işlem bazlı görev akışı eklendi
+   - DocumentProcessWorkflow ile kredi/kart evrak akışı eklendi
+   - GoldExchangeWorkflow ile altın değerlendirme akışı eklendi
+   - FastTrackActionSystem ile hızlı işlem akışı eklendi
+   - UtilityBillSystem ile elektrik/su/telefon fatura varyasyonları ve BarcodeScanner feedback'i eklendi
+   - Late game için Gelişmiş Fatura Yönetimi: renkli fatura kutuları ve doğru kutuya ayırma sistemi planlandı
+   - CustomerPatience ve SecuritySystem ile sabır/güvenlik sistemi eklendi
+   - ThiefEventSystem ile hırsız/polis etkinliği ve süre dondurma eklendi
+   - LazyAssistantAI ile ikinci gişe yardımcısı eklendi
+   - AssistantManager ile yardımcı çağırma barı ve cooldown akışı eklendi
+   - BankTransaction presetleriyle işlem verisi modeli eklendi
+   - VIPEscortSystem ile VIP kasa eşlik görevi eklendi
+   - CardBlockMiniGame ile kart blokesi renk sırası mini-game'i eklendi
+   - QuestSpawner ile görev havuzu, level progression ve dynamic pacing eklendi
+   - StaffInterruptionSystem ile gişe işlemini bölen iş arkadaşı evrak akışı eklendi
+   - CashDeliverySystem ile kasa boşalma ve merkezden nakit yenileme krizi eklendi
+   - Cash flow balance ile deposit/withdrawal kasa döngüsü dengelendi
+   - PhoneInterruptionSystem ile hızlı refleks telefon çağrısı mini-event'i eklendi
+   - TeaLadyBoostSystem ile çay/kahve power-up ve KafeinMode eklendi
+   - HeistRaidSystem ile nakit teslim dönüşü stealth soygun baskını eklendi
    - Gişe servis kontrolcüsü
 
 7. Skor sistemi
@@ -87,6 +173,22 @@ Bu dosya, Unity prototipi için bilinen isterleri, eksikleri ve önerilen geliş
    - Oyuncu işlemi tamamlar
    - Puan ve combo gösterilir
    - Sıradaki müşteri gelir
+
+9. İkinci faz: kaos ve çeşitlilik
+   - Altın Bozdurma ve Kredi Onayı çok istasyonlu işleri sırayla aç
+   - Elektrik/Su/Telefon fatura varyasyonlarını aktif havuza ekle
+   - Görev ağırlıklarını oyuncunun ritmi bozulmayacak şekilde dengele
+
+10. Son dokunuş: kriz ve yardımcı sistemleri
+   - Çaycı Abla ve Telefon gibi kısa süreli olayları aç
+   - LazyAssistantAI ile sıkışma anındaki yardım akışını ve SnackDrawer ile besleme/yavaşlama riskini test et
+   - Hırsız/Polis ve Heist Raid olaylarını nadir, yüksek tansiyonlu event olarak devreye al
+
+## Pre-run Shop Satis UI Notlari
+
+- Anti-Grumpiness / Papatya Cayi karti pre-level popup icinde `BestSellerRibbon` ile "Cok Satan!" olarak isaretlenir; kurdele `BestSellerRibbonFloat` ile hafif bobbing animasyonu yapar.
+- `BuyBundleButton`, 3 booster'i 150 Altin yerine 120 Altinlik "Tontis Paket" olarak satin alir; basarili satin almada TimeSlow, Speed ve Patience stoklarina +1 eklenir ve ucu birden upcoming run icin equipped olur.
+- Bundle satin alma, standart tekil booster secimindeki 2 aktif booster sinirinin ozel kampanya istisnasidir; popup konfeti particle feedback'i ve cash register sesiyle sonucu oyuncuya hissettirir.
 
 ## Karar Bekleyen Konular
 
