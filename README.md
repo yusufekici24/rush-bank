@@ -11,7 +11,17 @@ Proje PR akisi ile gelistirilir. `main` branch'ine dogrudan push yapilmaz. Degis
 - Temel Unity klasorleri hazir: `Assets`, `Packages`, `ProjectSettings`
 - Prototype setup araci hazir: `RushBank > Setup Prototype Scenes`
 - Core gameplay, kriz, meta-game, uzman masa ve gunluk gorev sistemleri script seviyesinde hazir
+- Prosedurel gorsel katman hazir: `Assets/Scripts/Art` (malzeme/doku kutuphanesi, tontis karakter giydirme, istasyon dekorlari)
 - Bu ortamda Unity Editor acilamadigi icin compile/play mode dogrulamasi Unity Hub uzerinden yapilmalidir
+
+## Gorsel Katman
+
+Oyunun grafikleri prosedurel olarak calisma aninda kurulur; harici model/texture asset'i gerekmez.
+
+- `RushBankArtLibrary`: paylasilan renk paleti, malzeme onbellegi ve prosedurel dokular (damali zemin, lambri duvar, hali). Standard shader bulunamazsa URP Lit'e duser.
+- `ChubbyCharacterDresser` + `ChubbyVisualSkinner`: sahnedeki kapsul karakterleri isim/stil kurallarina gore otomatik giydirir (goz, yanak, kol, ayak + role gore sapka, onluk, maske, kravat vb.). Musteriler icin sac varyasyonlari instance id uzerinden deterministiktir. Sabir/renk feedback'i bozulmasin diye orijinal kapsul renderer'ina dokunulmaz, gorsel parcalari cocuk obje olarak eklenir.
+- `PrototypeBankEnvironmentBuilder`: banka salonunu bastan kurar (giseler, cam bolmeler, kuyruk bariyerleri, bekleme banklari, ATM, bitkiler, tabela, saat, posterler, tavan lambalari) ve isik/ambiyans ayarini yapar. Var olan `Prototype Environment` kokunu silip yeniden kurdugu icin kayitli Game sahnesi Play'e basildiginda otomatik yeni gorunume gecer.
+- Istasyon kupleri (Dokuman/Mudur/Arsiv/Ekspertiz/Yazici/Kasa/Cekmece/Cay masasi) tag uzerinden bulunur ve ustlerine rol dekorlari eklenir; collider ve renderer feedback'leri korunur.
 
 ## Oyun Ozeti
 
