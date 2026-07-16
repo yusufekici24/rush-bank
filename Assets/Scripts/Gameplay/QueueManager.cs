@@ -198,6 +198,21 @@ namespace RushBank.Gameplay
             activeCustomer = null;
         }
 
+        public QueueCustomer ReleaseActiveCustomerForRedirect()
+        {
+            if (activeCustomer == null)
+            {
+                return null;
+            }
+
+            var releasedCustomer = activeCustomer;
+            activeCustomer = null;
+            releasedCustomer.StopPatience();
+            releasedCustomer.ClearRequestIcon();
+            RefreshWaitingTargets();
+            return releasedCustomer;
+        }
+
         public CustomerPatience FindLowestPatienceCustomer()
         {
             CustomerPatience lowestPatienceCustomer = null;
@@ -264,6 +279,25 @@ namespace RushBank.Gameplay
             }
 
             return removed;
+        }
+
+        public bool MoveCustomerToFront(GameObject customerObject)
+        {
+            if (customerObject == null)
+            {
+                return false;
+            }
+
+            var index = customerQueue.IndexOf(customerObject);
+            if (index < 0)
+            {
+                return false;
+            }
+
+            customerQueue.RemoveAt(index);
+            customerQueue.Insert(0, customerObject);
+            RefreshWaitingTargets();
+            return true;
         }
 
         public void ApplyQueueReliefBoost(float restorePercent, float drainMultiplier, float durationSeconds)
@@ -355,6 +389,12 @@ namespace RushBank.Gameplay
             activeCustomer.MoveTowards(GetCounterPosition(), moveSpeed);
             if (activeCustomer.IsPatienceExpired)
             {
+                var incidentManager = CounterIncidentManager.Instance;
+                if (incidentManager != null && incidentManager.TriggerCounterMeltdown(activeCustomer.gameObject))
+                {
+                    return;
+                }
+
                 SendActiveCustomerAwayAngry();
             }
         }
@@ -395,6 +435,54 @@ namespace RushBank.Gameplay
             }
 
             OnCustomerLeftAngry.Invoke(leavingCustomer.gameObject);
+        }
+
+        public QueueCustomer ReleaseActiveCustomerForIncident(GameObject customerObject)
+        {
+            if (activeCustomer == null || (customerObject != null && activeCustomer.gameObject != customerObject))
+            {
+                return null;
+            }
+
+            var releasedCustomer = activeCustomer;
+            activeCustomer = null;
+            releasedCustomer.StopPatience();
+            releasedCustomer.ClearRequestIcon();
+            RefreshWaitingTargets();
+            return releasedCustomer;
+        }
+
+        public QueueCustomer ReleaseCustomerForIncident(GameObject customerObject)
+        {
+            if (customerObject == null)
+            {
+                return null;
+            }
+
+            if (activeCustomer != null && activeCustomer.gameObject == customerObject)
+            {
+                return ReleaseActiveCustomerForIncident(customerObject);
+            }
+
+            var removed = customerQueue.Remove(customerObject);
+            for (var i = movingToWaiting.Count - 1; i >= 0; i--)
+            {
+                if (movingToWaiting[i] == null || movingToWaiting[i].gameObject == customerObject)
+                {
+                    movingToWaiting.RemoveAt(i);
+                }
+            }
+
+            if (!removed)
+            {
+                return null;
+            }
+
+            var releasedCustomer = EnsureQueueCustomer(customerObject);
+            releasedCustomer.StopPatience();
+            releasedCustomer.ClearRequestIcon();
+            RefreshWaitingTargets();
+            return releasedCustomer;
         }
 
         private void RefreshWaitingTargets()

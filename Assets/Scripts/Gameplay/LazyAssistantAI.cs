@@ -303,7 +303,12 @@ namespace RushBank.Gameplay
                 CustomerRequestKind.OpenAccount => passbookBaseSeconds,
                 CustomerRequestKind.PassbookPrinting => passbookBaseSeconds,
                 CustomerRequestKind.BillPayment => passbookBaseSeconds,
+                CustomerRequestKind.MobileActivation => passbookBaseSeconds,
+                CustomerRequestKind.PhilanthropistCustomer => passbookBaseSeconds,
                 CustomerRequestKind.CardBlockRemoval => passbookBaseSeconds,
+                CustomerRequestKind.InsuranceReferral => passbookBaseSeconds,
+                CustomerRequestKind.ScammerCustomer => complexTaskBaseSeconds,
+                CustomerRequestKind.BarutCustomer => complexTaskBaseSeconds,
                 _ => complexTaskBaseSeconds
             };
 

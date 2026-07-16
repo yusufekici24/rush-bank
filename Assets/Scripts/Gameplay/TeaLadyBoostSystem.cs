@@ -37,21 +37,43 @@ namespace RushBank.Gameplay
         [SerializeField] private ChubbyTopDownInputController topDownController;
         [SerializeField] private FastTrackActionSystem fastTrackActionSystem;
         [SerializeField] private UtilityBillSystem utilityBillSystem;
+        [SerializeField] private MobileActivationMiniGame mobileActivationMiniGame;
+        [SerializeField] private BankingActionSystem bankingActionSystem;
         [SerializeField] private DocumentProcessWorkflow documentProcessWorkflow;
         [SerializeField] private GoldExchangeWorkflow goldExchangeWorkflow;
+        [SerializeField] private QueueManager queueManager;
 
         [Header("Boost")]
         [SerializeField, Min(0.1f)] private float boostDurationSeconds = 8f;
+        [SerializeField, Min(0.1f)] private float drinkBoostDurationSeconds = 10f;
         [SerializeField, Min(1f)] private float speedBoostMultiplier = 1.3f;
         [SerializeField, Range(0.05f, 1f)] private float actionTimeMultiplier = 0.6f;
 
         [Header("UI")]
         [SerializeField] private GameObject boostOverlay;
         [SerializeField] private Slider boostRemainingSlider;
+        [SerializeField] private GameObject teaChoiceRoot;
+        [SerializeField] private Button drinkButton;
+        [SerializeField] private Button serveButton;
+
+        [Header("Hospitality")]
+        [SerializeField] private Animator playerAnimator;
+        [SerializeField] private string carryingTrayBool = "CarryingTray";
+        [SerializeField] private GameObject trayPrefab;
+        [SerializeField] private Transform trayHoldPoint;
+        [SerializeField, Min(1)] private int maxTeaPortions = 3;
+        [SerializeField, Min(0.1f)] private float hospitalityDurationSeconds = 12f;
+        [SerializeField, Min(0.1f)] private float serveInteractionRange = 1.6f;
+        [SerializeField, Range(0f, 1f)] private float patienceRestorePercent = 0.4f;
+        [SerializeField, Range(0f, 1f)] private float patienceSlowMultiplier = 0.7f;
+        [SerializeField, Min(0.1f)] private float patienceSlowSeconds = 8f;
 
         public UnityEvent<TeaLadyBoostState> OnBoostStateChanged = new UnityEvent<TeaLadyBoostState>();
         public UnityEvent OnTeaCupSpawned = new UnityEvent();
         public UnityEvent OnTeaCupCollected = new UnityEvent();
+        public UnityEvent<int> OnTeaPortionsChanged = new UnityEvent<int>();
+        public UnityEvent OnHospitalityStarted = new UnityEvent();
+        public UnityEvent OnHospitalityEnded = new UnityEvent();
 
         private TeaLadyBoostState state = TeaLadyBoostState.Inactive;
         private GameObject activeTeaLady;
@@ -62,13 +84,25 @@ namespace RushBank.Gameplay
         private float cupLifetimeTimer;
         private float previousFastTrackTimeMultiplier = 1f;
         private float previousUtilityBillTimeMultiplier = 1f;
+        private float previousMobileActivationTimeMultiplier = 1f;
         private float previousDocumentTimeMultiplier = 1f;
         private float previousGoldTimeMultiplier = 1f;
         private ParticleSystem activeSpeedTrailEffect;
+        private GameObject activeTray;
+        private Coroutine hospitalityRoutine;
+        private int teaPortions;
+        private bool choiceOpen;
         private bool speedBoostApplied;
+        private bool actionBoostApplied;
+        private bool fastTrackWasEnabled;
+        private bool utilityBillWasEnabled;
+        private bool bankingWasEnabled;
+        private bool documentWasEnabled;
+        private bool goldWasEnabled;
 
         public TeaLadyBoostState State => state;
         public bool IsBoostActive => state == TeaLadyBoostState.Active;
+        public bool IsHospitalityModeActive => hospitalityRoutine != null;
 
         private void Awake()
         {
@@ -80,10 +114,34 @@ namespace RushBank.Gameplay
             ResolveMissingReferences();
             ResetSpawnTimer();
             SetBoostUi(false, 0f);
+            SetChoiceUi(false);
+        }
+
+        private void OnEnable()
+        {
+            if (drinkButton != null)
+            {
+                drinkButton.onClick.AddListener(ChooseDrink);
+            }
+
+            if (serveButton != null)
+            {
+                serveButton.onClick.AddListener(ChooseServe);
+            }
         }
 
         private void OnDisable()
         {
+            if (drinkButton != null)
+            {
+                drinkButton.onClick.RemoveListener(ChooseDrink);
+            }
+
+            if (serveButton != null)
+            {
+                serveButton.onClick.RemoveListener(ChooseServe);
+            }
+
             if (teaLadyRoutine != null)
             {
                 StopCoroutine(teaLadyRoutine);
@@ -98,6 +156,7 @@ namespace RushBank.Gameplay
 
             DestroyTeaLady();
             DestroyActiveCup();
+            EndHospitalityMode();
             EndBoost();
         }
 
@@ -106,6 +165,8 @@ namespace RushBank.Gameplay
             TickTeaLadySpawn();
             TickCupLifetime();
             TickCupInput();
+            TickChoiceInput();
+            TickHospitalityInput();
         }
 
         public void ForceSpawnTeaLady()
@@ -147,7 +208,7 @@ namespace RushBank.Gameplay
 
         private void TickCupInput()
         {
-            if (activeCup == null)
+            if (activeCup == null || choiceOpen)
             {
                 return;
             }
@@ -418,8 +479,19 @@ namespace RushBank.Gameplay
 
         private void CollectCup()
         {
-            DestroyActiveCup();
             OnTeaCupCollected.Invoke();
+            SetChoiceUi(true);
+        }
+
+        public void ChooseDrink()
+        {
+            if (!choiceOpen)
+            {
+                return;
+            }
+
+            SetChoiceUi(false);
+            DestroyActiveCup();
 
             if (boostRoutine != null)
             {
@@ -427,7 +499,36 @@ namespace RushBank.Gameplay
                 EndBoost();
             }
 
-            boostRoutine = StartCoroutine(BoostRoutine());
+            boostRoutine = StartCoroutine(DrinkBoostRoutine());
+        }
+
+        public void ChooseServe()
+        {
+            if (!choiceOpen)
+            {
+                return;
+            }
+
+            SetChoiceUi(false);
+            DestroyActiveCup();
+            StartHospitalityMode();
+        }
+
+        private void TickChoiceInput()
+        {
+            if (!choiceOpen)
+            {
+                return;
+            }
+
+            if (Input.GetKeyDown(KeyCode.Alpha1) || Input.GetKeyDown(KeyCode.D))
+            {
+                ChooseDrink();
+            }
+            else if (Input.GetKeyDown(KeyCode.Alpha2) || Input.GetKeyDown(KeyCode.S))
+            {
+                ChooseServe();
+            }
         }
 
         private IEnumerator BoostRoutine()
@@ -446,6 +547,318 @@ namespace RushBank.Gameplay
             boostRoutine = null;
         }
 
+        private IEnumerator DrinkBoostRoutine()
+        {
+            StartSpeedOnlyBoost();
+            var elapsed = 0f;
+            while (elapsed < drinkBoostDurationSeconds)
+            {
+                elapsed += Time.deltaTime;
+                var remaining01 = 1f - Mathf.Clamp01(elapsed / drinkBoostDurationSeconds);
+                SetBoostUi(true, remaining01);
+                yield return null;
+            }
+
+            EndBoost();
+            boostRoutine = null;
+        }
+
+        public void ServeNearestWaitingCustomer()
+        {
+            if (!IsHospitalityModeActive || teaPortions <= 0)
+            {
+                return;
+            }
+
+            var target = FindNearestWaitingCustomer();
+            if (target == null)
+            {
+                return;
+            }
+
+            ServeTeaToCustomer(target);
+        }
+
+        private void StartHospitalityMode()
+        {
+            ResolveMissingReferences();
+            EndBoost();
+
+            teaPortions = Mathf.Max(1, maxTeaPortions);
+            OnTeaPortionsChanged.Invoke(teaPortions);
+            SpawnTray();
+            SetCounterTasksBlocked(true);
+
+            if (playerAnimator != null && !string.IsNullOrWhiteSpace(carryingTrayBool))
+            {
+                playerAnimator.SetBool(carryingTrayBool, true);
+            }
+
+            if (hospitalityRoutine != null)
+            {
+                StopCoroutine(hospitalityRoutine);
+            }
+
+            hospitalityRoutine = StartCoroutine(HospitalityFailsafeRoutine());
+            OnHospitalityStarted.Invoke();
+        }
+
+        private IEnumerator HospitalityFailsafeRoutine()
+        {
+            var elapsed = 0f;
+            while (elapsed < hospitalityDurationSeconds && teaPortions > 0)
+            {
+                elapsed += Time.deltaTime;
+                yield return null;
+            }
+
+            EndHospitalityMode();
+        }
+
+        private void TickHospitalityInput()
+        {
+            if (!IsHospitalityModeActive)
+            {
+                return;
+            }
+
+            if (Input.GetKeyDown(KeyCode.E) || Input.GetKeyDown(KeyCode.Space) || Input.GetMouseButtonDown(0))
+            {
+                ServeNearestWaitingCustomer();
+            }
+
+            if (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began)
+            {
+                ServeNearestWaitingCustomer();
+            }
+        }
+
+        private QueueCustomer FindNearestWaitingCustomer()
+        {
+            if (queueManager == null)
+            {
+                queueManager = QueueManager.Instance != null ? QueueManager.Instance : FindFirstObjectByType<QueueManager>();
+            }
+
+            var playerTransform = GetPlayerTransform();
+            if (queueManager == null || playerTransform == null)
+            {
+                return null;
+            }
+
+            QueueCustomer nearest = null;
+            var nearestDistance = serveInteractionRange * serveInteractionRange;
+            var queue = queueManager.CustomerQueue;
+            for (var i = 0; i < queue.Count; i++)
+            {
+                var customerObject = queue[i];
+                if (customerObject == null || !customerObject.TryGetComponent<QueueCustomer>(out var customer))
+                {
+                    continue;
+                }
+
+                var distance = (customer.transform.position - playerTransform.position).sqrMagnitude;
+                if (distance <= nearestDistance)
+                {
+                    nearestDistance = distance;
+                    nearest = customer;
+                }
+            }
+
+            return nearest;
+        }
+
+        private void ServeTeaToCustomer(QueueCustomer customer)
+        {
+            if (customer == null || teaPortions <= 0)
+            {
+                return;
+            }
+
+            customer.RestorePatiencePercent(patienceRestorePercent);
+            customer.SetPatienceDrainMultiplier(patienceSlowMultiplier);
+            StartCoroutine(ResetQueueCustomerDrainRoutine(customer, patienceSlowSeconds));
+
+            if (customer.TryGetComponent<CustomerPatience>(out var patience))
+            {
+                patience.RestorePatience(patienceRestorePercent * 100f);
+                patience.SetDrainMultiplier(patienceSlowMultiplier);
+                StartCoroutine(ResetCustomerPatienceDrainRoutine(patience, patienceSlowSeconds));
+            }
+
+            SpawnHospitalityFeedback(customer.transform);
+            teaPortions--;
+            OnTeaPortionsChanged.Invoke(teaPortions);
+
+            if (teaPortions <= 0)
+            {
+                EndHospitalityMode();
+            }
+        }
+
+        private IEnumerator ResetQueueCustomerDrainRoutine(QueueCustomer customer, float delay)
+        {
+            yield return new WaitForSeconds(delay);
+            if (customer != null)
+            {
+                customer.ResetPatienceDrainMultiplier();
+            }
+        }
+
+        private IEnumerator ResetCustomerPatienceDrainRoutine(CustomerPatience patience, float delay)
+        {
+            yield return new WaitForSeconds(delay);
+            if (patience != null)
+            {
+                patience.ResetDrainMultiplier();
+            }
+        }
+
+        private void EndHospitalityMode()
+        {
+            var wasActive = hospitalityRoutine != null || activeTray != null || teaPortions > 0;
+            if (!wasActive)
+            {
+                return;
+            }
+
+            if (hospitalityRoutine != null)
+            {
+                StopCoroutine(hospitalityRoutine);
+                hospitalityRoutine = null;
+            }
+
+            teaPortions = 0;
+            DestroyTray();
+            SetCounterTasksBlocked(false);
+
+            if (playerAnimator != null && !string.IsNullOrWhiteSpace(carryingTrayBool))
+            {
+                playerAnimator.SetBool(carryingTrayBool, false);
+            }
+
+            OnTeaPortionsChanged.Invoke(teaPortions);
+            OnHospitalityEnded.Invoke();
+        }
+
+        private void SpawnTray()
+        {
+            DestroyTray();
+            var parent = trayHoldPoint != null ? trayHoldPoint : GetPlayerTransform();
+            if (parent == null)
+            {
+                return;
+            }
+
+            activeTray = trayPrefab != null
+                ? Instantiate(trayPrefab, parent)
+                : CreateFallbackTray(parent);
+
+            activeTray.transform.localPosition = Vector3.zero;
+            activeTray.transform.localRotation = Quaternion.identity;
+        }
+
+        private GameObject CreateFallbackTray(Transform parent)
+        {
+            var tray = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            tray.name = "Hospitality Tea Tray";
+            tray.transform.SetParent(parent, false);
+            tray.transform.localScale = new Vector3(0.58f, 0.05f, 0.34f);
+            var renderer = tray.GetComponent<Renderer>();
+            if (renderer != null)
+            {
+                renderer.sharedMaterial = CreateMaterial(new Color(0.9f, 0.62f, 0.28f));
+            }
+
+            var collider = tray.GetComponent<Collider>();
+            if (collider != null)
+            {
+                collider.enabled = false;
+            }
+
+            return tray;
+        }
+
+        private void DestroyTray()
+        {
+            if (activeTray != null)
+            {
+                Destroy(activeTray);
+                activeTray = null;
+            }
+        }
+
+        private void SetCounterTasksBlocked(bool blocked)
+        {
+            if (blocked)
+            {
+                fastTrackWasEnabled = fastTrackActionSystem == null || fastTrackActionSystem.enabled;
+                utilityBillWasEnabled = utilityBillSystem == null || utilityBillSystem.enabled;
+                bankingWasEnabled = bankingActionSystem == null || bankingActionSystem.enabled;
+                documentWasEnabled = documentProcessWorkflow == null || documentProcessWorkflow.enabled;
+                goldWasEnabled = goldExchangeWorkflow == null || goldExchangeWorkflow.enabled;
+            }
+
+            if (fastTrackActionSystem != null)
+            {
+                fastTrackActionSystem.enabled = !blocked && fastTrackWasEnabled;
+            }
+
+            if (utilityBillSystem != null)
+            {
+                utilityBillSystem.enabled = !blocked && utilityBillWasEnabled;
+            }
+
+            if (bankingActionSystem != null)
+            {
+                bankingActionSystem.enabled = !blocked && bankingWasEnabled;
+            }
+
+            if (documentProcessWorkflow != null)
+            {
+                documentProcessWorkflow.enabled = !blocked && documentWasEnabled;
+            }
+
+            if (goldExchangeWorkflow != null)
+            {
+                goldExchangeWorkflow.enabled = !blocked && goldWasEnabled;
+            }
+        }
+
+        private void SpawnHospitalityFeedback(Transform target)
+        {
+            if (target == null)
+            {
+                return;
+            }
+
+            var labelObject = new GameObject("Hospitality Tea Floating Text");
+            labelObject.transform.SetParent(target, false);
+            labelObject.transform.localPosition = Vector3.up * 1.85f;
+            labelObject.transform.localRotation = Quaternion.Euler(65f, 0f, 0f);
+            var label = labelObject.AddComponent<TextMesh>();
+            label.text = "\u2615 <3";
+            label.anchor = TextAnchor.MiddleCenter;
+            label.alignment = TextAlignment.Center;
+            label.fontStyle = FontStyle.Bold;
+            label.characterSize = 0.24f;
+            label.color = new Color(1f, 0.55f, 0.78f);
+
+            var particles = labelObject.AddComponent<ParticleSystem>();
+            var main = particles.main;
+            main.startColor = new Color(1f, 0.42f, 0.72f, 0.86f);
+            main.startLifetime = 0.75f;
+            main.startSpeed = 0.75f;
+            main.startSize = 0.08f;
+            main.maxParticles = 18;
+
+            var emission = particles.emission;
+            emission.SetBursts(new[] { new ParticleSystem.Burst(0f, (short)12) });
+
+            particles.Play();
+            Destroy(labelObject, 1.25f);
+        }
+
         private void StartBoost()
         {
             ResolveMissingReferences();
@@ -461,6 +874,7 @@ namespace RushBank.Gameplay
             }
 
             speedBoostApplied = mobilePlayerController != null || topDownController != null;
+            actionBoostApplied = true;
 
             if (fastTrackActionSystem != null)
             {
@@ -472,6 +886,12 @@ namespace RushBank.Gameplay
             {
                 previousUtilityBillTimeMultiplier = utilityBillSystem.ActionTimeMultiplier;
                 utilityBillSystem.ActionTimeMultiplier = previousUtilityBillTimeMultiplier * actionTimeMultiplier;
+            }
+
+            if (mobileActivationMiniGame != null)
+            {
+                previousMobileActivationTimeMultiplier = mobileActivationMiniGame.ActionTimeMultiplier;
+                mobileActivationMiniGame.ActionTimeMultiplier = previousMobileActivationTimeMultiplier * actionTimeMultiplier;
             }
 
             if (documentProcessWorkflow != null)
@@ -486,6 +906,27 @@ namespace RushBank.Gameplay
                 goldExchangeWorkflow.ActionTimeMultiplier = previousGoldTimeMultiplier * actionTimeMultiplier;
             }
 
+            SetBoostUi(true, 1f);
+            CreateSpeedTrailEffect();
+            SetState(TeaLadyBoostState.Active);
+        }
+
+        private void StartSpeedOnlyBoost()
+        {
+            ResolveMissingReferences();
+
+            if (mobilePlayerController != null)
+            {
+                mobilePlayerController.MovementSpeedMultiplier *= speedBoostMultiplier;
+            }
+
+            if (topDownController != null)
+            {
+                topDownController.MovementSpeedMultiplier *= speedBoostMultiplier;
+            }
+
+            speedBoostApplied = mobilePlayerController != null || topDownController != null;
+            actionBoostApplied = false;
             SetBoostUi(true, 1f);
             CreateSpeedTrailEffect();
             SetState(TeaLadyBoostState.Active);
@@ -512,26 +953,32 @@ namespace RushBank.Gameplay
 
             speedBoostApplied = false;
 
-            if (fastTrackActionSystem != null)
+            if (actionBoostApplied && fastTrackActionSystem != null)
             {
                 fastTrackActionSystem.ActionTimeMultiplier = previousFastTrackTimeMultiplier;
             }
 
-            if (utilityBillSystem != null)
+            if (actionBoostApplied && utilityBillSystem != null)
             {
                 utilityBillSystem.ActionTimeMultiplier = previousUtilityBillTimeMultiplier;
             }
 
-            if (documentProcessWorkflow != null)
+            if (actionBoostApplied && mobileActivationMiniGame != null)
+            {
+                mobileActivationMiniGame.ActionTimeMultiplier = previousMobileActivationTimeMultiplier;
+            }
+
+            if (actionBoostApplied && documentProcessWorkflow != null)
             {
                 documentProcessWorkflow.ActionTimeMultiplier = previousDocumentTimeMultiplier;
             }
 
-            if (goldExchangeWorkflow != null)
+            if (actionBoostApplied && goldExchangeWorkflow != null)
             {
                 goldExchangeWorkflow.ActionTimeMultiplier = previousGoldTimeMultiplier;
             }
 
+            actionBoostApplied = false;
             SetBoostUi(false, 0f);
             DestroySpeedTrailEffect();
             SetState(TeaLadyBoostState.Inactive);
@@ -721,6 +1168,25 @@ namespace RushBank.Gameplay
             }
         }
 
+        private void SetChoiceUi(bool visible)
+        {
+            choiceOpen = visible;
+            if (teaChoiceRoot != null)
+            {
+                teaChoiceRoot.SetActive(visible);
+            }
+
+            if (drinkButton != null)
+            {
+                drinkButton.gameObject.SetActive(visible);
+            }
+
+            if (serveButton != null)
+            {
+                serveButton.gameObject.SetActive(visible);
+            }
+        }
+
         private void ResetSpawnTimer()
         {
             var min = Mathf.Min(spawnIntervalSeconds.x, spawnIntervalSeconds.y);
@@ -750,6 +1216,16 @@ namespace RushBank.Gameplay
                 utilityBillSystem = FindFirstObjectByType<UtilityBillSystem>();
             }
 
+            if (mobileActivationMiniGame == null)
+            {
+                mobileActivationMiniGame = FindFirstObjectByType<MobileActivationMiniGame>();
+            }
+
+            if (bankingActionSystem == null)
+            {
+                bankingActionSystem = FindFirstObjectByType<BankingActionSystem>();
+            }
+
             if (documentProcessWorkflow == null)
             {
                 documentProcessWorkflow = FindFirstObjectByType<DocumentProcessWorkflow>();
@@ -758,6 +1234,20 @@ namespace RushBank.Gameplay
             if (goldExchangeWorkflow == null)
             {
                 goldExchangeWorkflow = FindFirstObjectByType<GoldExchangeWorkflow>();
+            }
+
+            if (queueManager == null)
+            {
+                queueManager = QueueManager.Instance != null ? QueueManager.Instance : FindFirstObjectByType<QueueManager>();
+            }
+
+            if (playerAnimator == null)
+            {
+                var playerTransform = GetPlayerTransform();
+                if (playerTransform != null)
+                {
+                    playerAnimator = playerTransform.GetComponentInChildren<Animator>();
+                }
             }
         }
 

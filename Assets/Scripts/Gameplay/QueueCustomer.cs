@@ -31,7 +31,13 @@ namespace RushBank.Gameplay
         GoldExchange,
         CreditApproval,
         VipSafeRental,
-        Thief
+        Thief,
+        WireTransfer,
+        InsuranceReferral,
+        BarutCustomer,
+        MobileActivation,
+        ScammerCustomer,
+        PhilanthropistCustomer
     }
 
     public class QueueCustomer : MonoBehaviour
@@ -66,9 +72,12 @@ namespace RushBank.Gameplay
         public CustomerRequestKind RequestKind => requestKind;
         public float Patience01 => patienceSeconds <= 0f ? 0f : Mathf.Clamp01(patienceRemaining / patienceSeconds);
         public bool IsPatienceExpired => patienceRunning && patienceRemaining <= 0f;
+        public float PatienceDrainMultiplier => patienceDrainMultiplier;
         public float AgePatienceDrainMultiplier => GetAgePatienceDrainMultiplier(ageGroup);
         public float EffectivePatienceDrainMultiplier => patienceDrainMultiplier * AgePatienceDrainMultiplier * GlobalPatienceDrainMultiplier;
         public bool IsVipRequest => requestKind == CustomerRequestKind.VipSafeRental;
+        public bool IsScammer => requestKind == CustomerRequestKind.ScammerCustomer;
+        public bool IsPhilanthropist => requestKind == CustomerRequestKind.PhilanthropistCustomer;
         public virtual float PatienceSecondsMultiplier => IsVipRequest ? vipPatienceSecondsMultiplier : 1f;
         public static float GlobalPatienceDrainMultiplier
         {
@@ -118,6 +127,13 @@ namespace RushBank.Gameplay
         {
             patienceSeconds = Mathf.Max(0.1f, seconds);
             patienceRemaining = patienceSeconds;
+            patienceRunning = true;
+            UpdatePatienceBar();
+        }
+
+        public void SetPatiencePercent(float percent)
+        {
+            patienceRemaining = patienceSeconds * Mathf.Clamp01(percent);
             patienceRunning = true;
             UpdatePatienceBar();
         }

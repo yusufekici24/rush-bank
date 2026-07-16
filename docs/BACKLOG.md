@@ -62,6 +62,21 @@ Bu dosya, Unity prototipi için bilinen isterleri, eksikleri ve önerilen geliş
 - Cash flow dengesi eklendi; başarılı Deposit işlemleri kasayı +1 doldurur, Withdrawal işlemleri kasayı -1 azaltır.
 - PhoneInterruptionSystem eklendi; 30-45 saniye random telefon çalma, 4 saniyelik cevap penceresi, reaction-time çarpanı, 2 saniye time freeze ve kaçırılan çağrı cooldown akışı hazır.
 - TeaLadyBoostSystem eklendi; 50-70 saniye TeaLadyNPC spawn, yemeni/önlük/tepsi fallback teyze görseli, yalpalama ve el sallama hissi, TeasideTable'a steam/glow TeaCup bırakma, tıklanınca 8 saniye KafeinMode, +30% hız, sarı hız izi ve 0.6x işlem süresi çarpanı hazır.
+- TeaLadySystem/TeaLadyBoostSystem güncellendi; Drink seçimi 10 saniye 1.3x hız verir, Serve seçimi 3 porsiyonluk Tea Hospitality moduna geçer, müşterilere çay ikramı 40% sabır toparlar ve 8 saniye 0.7x sabır düşüşü uygular.
+- AccountOpeningSystem eklendi; OpenAccount müşterisini 0.5 saniye stamp sonrası Relationship Manager Desk'e yönlendirir, ana gişe slotunu boşaltır ve sonraki 2 standart işlem timer'ını instant yapan Quick Boost verir.
+- InsuranceReferralSystem eklendi; InsuranceReferral müşterisini Sigortacıya Aktar butonuyla InsuranceSpecialistDesk'e yönlendirir, ana gişe slotunu boşaltır ve 12 saniye counter tabanlı işlem sürelerini 0.6x hızlandıran Teamwork Boost verir.
+- RedAlertRedirectionSystem eklendi; BarutCustomer 20% sabır ve 2x drain ile gelir, tıklanınca kuyruk önüne alınır, Acil Sevk ile Relationship Manager Desk'e gönderilir, +200 Gold ve kuyruktaki müşterilere 50% VIP Relief verir.
+- BankCatChaosSystem eklendi; Pati kedisi 15 saniye kuyruk sabrını dondurur, sonra rastgele müşteride kedi korkusu/panik tetikler, Call Security butonunu açar, Recai Abi kovalamacası sırasında sabrı normale döndürür ve 10 saniye sonunda kedi çıkıştan kaçar.
+- WireTransferMiniGame eklendi; WireTransfer müşterisi için 4-5 karakterlik alfanumerik kod, sanal klavye, Send akışı, yanlış tuş reseti ve 5 saniye/hatasız tamamlama halinde 15 saniyelik 1.2x GoldMultiplier `Perfect Transfer` boost'u hazır.
+- MobileActivationMiniGame eklendi; MobileActivation müşterisi için Send SMS butonu, 0.5 sn loading, telefon ekranında 4 haneli SMS kodu, numpad doğrulama ve 15 saniye müşteri spawn interval'ini 1.3x yapan Digital Boost hazır.
+- CharityDonationSystem eklendi; PhilanthropistCustomer 100% sabır ve 0.5x sabır drain ile gelir, hayvan/doğa/çocuk/sağlık bağış kategorisi seçtirir, yanlış seçimde küçük skor cezası verir, doğru bağışta kalp efekti ve 15 saniyelik 0.6x Karma Boost uygular.
+- ManagerITSupportEvent eklendi; müdür bilgisayarı 45 saniyelik kontrolle %15 ihtimalle bozulur, BlueScreen/LooseCable/OverheatingFan mini-game'lerinden biri açılır, tamirde +150 Gold ve 15 saniyelik sabır freeze + 1.2x hız Manager Grace Boost verir.
+- StationeryDeliverySystem eklendi; Müşteri İlişkileri veya Sigorta masası A4/Pen/Stapler isteyebilir, sorun çözülene kadar masa yönlendirme kabul etmez, doğru kırtasiye tesliminde +80 Gold ve o masaya sonraki 3 yönlendirme için 2x hızlı Efficiency Boost verir.
+- CreditApplicationSystem eklendi; CreditApproval müşterisi Housing/Vehicle/Consumer alt türlerinden biriyle gelir, 0.8 sn kredi notu sorgusu 80% onay/20% red üretir, redde +30 Gold, onayda CreditSpecialistDesk yönlendirmesi ve kredi türüne göre +120/+80/+50 Gold verir; Credit Boost 15 saniye uzman masa yönlendirmelerini 1.3x hızlandırır.
+- QuestAndAchievementManager eklendi; günlük görevleri ve uzun vadeli başarımları PlayerPrefs ile takip eder, başarılı işlem/event listener'larıyla ilerletir, altın ödülü verir, sağ üst bildirim banner'ı gösterir ve geçici/kalıcı passive boost uygular.
+- ManagerSatisfactionSystem eklendi; müdür memnuniyet barı IT tamiri, kırtasiye teslimi, dolandırıcı yakalama, Barut müşteri sevki ve perfect işlemle dolar; gişe krizi ve dolandırıcıya yanlış onayla düşer; %100'de Staff Feast tetikleyip 20 saniye sabır freeze, 1.3x oyuncu hızı, 0.5x işlem süresi ve 2x yönlendirme hızı verir.
+- ScammerDetectionSystem eklendi; ScammerCustomer normal işlem ikonu arkasına saklanır, evrak inceleme panelinde fotoğraf/tarih/sahte mühür tutarsızlığı kontrol edilir, yanlış onayda -150 Gold ve FAILED AUDIT kilidi, doğru redde +50 Gold, güvenlik çağırmada +100 Gold ve 10 saniyelik Hero Employee sabır dondurma boost'u hazır.
+- CounterIncidentManager ve SecurityGuardAI eklendi; aktif gişe müşterisinin sabrı sıfırlanınca işlem UI/workflow iptali, -100 Gold cezası, AngryGesticulation feedback'i, güvenlik eskortu ve 10 saniyelik Panic Attack debuff akışı hazır.
 - HeistRaidSystem eklendi; Super Cash Bag ile şubeye girince %10-15 nadir soygun roll'u, yamuk çorap maskeli 2-3 hırsız, konuşma/el sallama cue'ları, kırmızı/mavi göz cue, oyuncu diz titreme korku efekti, %50 yavaşlama, yakalanınca 2 saniye freeze cezası, alarm butonu, polis gelince çuval fırlatma ve tutuklama akışı hazır.
 - Kamera sistemi yok.
 - Etkileşim sistemi sahneye bağlanmadı.
@@ -158,6 +173,11 @@ Bu dosya, Unity prototipi için bilinen isterleri, eksikleri ve önerilen geliş
    - Cash flow balance ile deposit/withdrawal kasa döngüsü dengelendi
    - PhoneInterruptionSystem ile hızlı refleks telefon çağrısı mini-event'i eklendi
    - TeaLadyBoostSystem ile çay/kahve power-up ve KafeinMode eklendi
+   - CharityDonationSystem ile hayırsever müşteri, kategori seçimi ve Karma Boost eklendi
+   - ManagerITSupportEvent ve StationeryDeliverySystem ile banka içi arıza/kırtasiye koşturmacası eklendi
+   - CreditApplicationSystem ile konut/taşıt/ihtiyaç kredisi sorgulama ve Kredi Uzmanı yönlendirmesi eklendi
+   - ManagerSatisfactionSystem ile iç başarıların birikerek Staff Feast boost'una dönüşmesi eklendi
+   - ScammerDetectionSystem ile kimlik/evrak tutarsızlığı yakalama ve güvenlik çağırma mekaniği eklendi
    - HeistRaidSystem ile nakit teslim dönüşü stealth soygun baskını eklendi
    - Gişe servis kontrolcüsü
 

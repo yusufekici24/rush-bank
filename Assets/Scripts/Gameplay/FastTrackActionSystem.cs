@@ -151,6 +151,19 @@ namespace RushBank.Gameplay
             }
         }
 
+        public void CancelWorkflow()
+        {
+            if (processingRoutine != null)
+            {
+                StopCoroutine(processingRoutine);
+                processingRoutine = null;
+            }
+
+            SetProgress(0f, false);
+            DestroyHeldItem();
+            OnFastTrackFailed.Invoke(activeTaskType);
+        }
+
         private IEnumerator ProcessRoutine(FastTrackTaskDefinition task)
         {
             OnFastTrackStarted.Invoke(task.taskType);
@@ -162,6 +175,12 @@ namespace RushBank.Gameplay
             }
 
             var progress = 0f;
+            if (AccountOpeningSystem.TryConsumeQuickBoostCharge())
+            {
+                progress = 1f;
+                SetProgress(1f, true);
+            }
+
             while (progress < 1f)
             {
                 var duration = Mathf.Max(0.05f, task.processingSeconds * actionTimeMultiplier);

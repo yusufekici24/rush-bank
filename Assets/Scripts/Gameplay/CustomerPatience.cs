@@ -47,7 +47,7 @@ namespace RushBank.Gameplay
         public CustomerMoodState MoodState => moodState;
         public float DrainMultiplier => drainMultiplier;
         public float AgeDrainMultiplier => GetAgeDrainMultiplier(ResolvedAgeGroup);
-        public float RequestDrainMultiplier => queueCustomer != null && queueCustomer.IsVipRequest ? vipDrainMultiplier : 1f;
+        public float RequestDrainMultiplier => GetRequestDrainMultiplier();
         public float EffectiveDrainMultiplier => drainMultiplier * AgeDrainMultiplier * RequestDrainMultiplier * GlobalPatienceDrainMultiplier;
         public static float GlobalPatienceDrainMultiplier
         {
@@ -186,6 +186,21 @@ namespace RushBank.Gameplay
                 CustomerAgeGroup.Elderly => elderlyDrainMultiplier,
                 _ => middleDrainMultiplier
             };
+        }
+
+        private float GetRequestDrainMultiplier()
+        {
+            if (queueCustomer == null)
+            {
+                return 1f;
+            }
+
+            if (queueCustomer.IsVipRequest)
+            {
+                return vipDrainMultiplier;
+            }
+
+            return queueCustomer.IsPhilanthropist ? 0.5f : 1f;
         }
     }
 }
