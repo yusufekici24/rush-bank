@@ -48,7 +48,10 @@ namespace RushBank.Gameplay
         public float DrainMultiplier => drainMultiplier;
         public float AgeDrainMultiplier => GetAgeDrainMultiplier(ResolvedAgeGroup);
         public float RequestDrainMultiplier => GetRequestDrainMultiplier();
-        public float EffectiveDrainMultiplier => drainMultiplier * AgeDrainMultiplier * RequestDrainMultiplier * GlobalPatienceDrainMultiplier;
+        public float WeatherDrainMultiplier => DynamicWeatherSystem.Instance != null
+            ? DynamicWeatherSystem.Instance.activePatienceMultiplier
+            : 1f;
+        public float EffectiveDrainMultiplier => drainMultiplier * AgeDrainMultiplier * RequestDrainMultiplier * GlobalPatienceDrainMultiplier * WeatherDrainMultiplier;
         public static float GlobalPatienceDrainMultiplier
         {
             get => globalPatienceDrainMultiplier;

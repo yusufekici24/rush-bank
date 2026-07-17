@@ -55,6 +55,9 @@ namespace RushBank.Gameplay
         [SerializeField] private GameObject staplerPrefab;
         [SerializeField] private ParticleSystem efficiencyParticlePrefab;
 
+        [Header("Urgency")]
+        [SerializeField] private StaffRequestUrgency requestUrgency;
+
         [Header("Reward")]
         [SerializeField, Min(0)] private int goldReward = 80;
         [SerializeField, Min(1)] private int efficiencyBoostCharges = 3;
@@ -78,8 +81,10 @@ namespace RushBank.Gameplay
         private int insuranceEfficiencyCharges;
         private int creditEfficiencyCharges;
         private bool shortageActive;
+        private bool deskLockedByUrgency;
 
         public bool IsShortageActive => shortageActive;
+        public bool IsDeskLockedByUrgency => deskLockedByUrgency;
         public StationeryDeskType ActiveDeskType => activeDeskType;
         public StationeryItemType RequestedItem => requestedItem;
         public float GlobalRedirectSpeedMultiplier { get; set; } = 1f;
@@ -109,6 +114,7 @@ namespace RushBank.Gameplay
         private void OnEnable()
         {
             RegisterButtons();
+            RegisterUrgencyListeners();
             if (autoTrigger && triggerRoutine == null)
             {
                 triggerRoutine = StartCoroutine(RandomShortageRoutine());
@@ -118,6 +124,7 @@ namespace RushBank.Gameplay
         private void OnDisable()
         {
             UnregisterButtons();
+            UnregisterUrgencyListeners();
             if (triggerRoutine != null)
             {
                 StopCoroutine(triggerRoutine);
@@ -127,7 +134,7 @@ namespace RushBank.Gameplay
 
         public bool IsDeskBlocked(Transform desk)
         {
-            return shortageActive && IsSameDesk(desk, GetActiveDesk());
+            return (shortageActive || deskLockedByUrgency) && IsSameDesk(desk, GetActiveDesk());
         }
 
         public bool CanAcceptRedirect(Transform desk)
@@ -237,7 +244,7 @@ namespace RushBank.Gameplay
             DeliverHeldSupplyToActiveDesk();
         }
 
-        public void CancelShortage()
+        public void CancelShortage(bool clearUrgency = true)
         {
             shortageActive = false;
             heldItemType = null;
@@ -245,6 +252,16 @@ namespace RushBank.Gameplay
             DestroyHeldItem();
             SetCarryingAnimation(false);
             SetSupplyMenuVisible(false);
+
+            if (clearUrgency)
+            {
+                requestUrgency?.ClearRequest();
+            }
+        }
+
+        public void UnlockUrgencyDesk()
+        {
+            deskLockedByUrgency = false;
         }
 
         private IEnumerator RandomShortageRoutine()
@@ -265,19 +282,22 @@ namespace RushBank.Gameplay
             activeDeskType = deskType;
             requestedItem = itemType;
             shortageActive = true;
+            deskLockedByUrgency = false;
             SpawnShortageIcon();
+            requestUrgency?.BeginRequest(GetActiveDesk());
             PlaySound(shortageSound);
             OnShortageStarted.Invoke(activeDeskType, requestedItem);
         }
 
         private void CompleteDelivery()
         {
+            requestUrgency?.ResolveRequest();
             AddGold(goldReward);
             PlaySound(deliverySound);
             SpawnEfficiencyEffect();
             AddEfficiencyCharges(activeDeskType, efficiencyBoostCharges);
             OnSupplyDelivered.Invoke(activeDeskType);
-            CancelShortage();
+            CancelShortage(false);
         }
 
         private void AddEfficiencyCharges(StationeryDeskType deskType, int charges)
@@ -590,6 +610,36 @@ namespace RushBank.Gameplay
             }
         }
 
+        private void RegisterUrgencyListeners()
+        {
+            if (requestUrgency == null)
+            {
+                return;
+            }
+
+            requestUrgency.OnRequestFailed.RemoveListener(HandleUrgencyRequestFailed);
+            requestUrgency.OnRequestFailed.AddListener(HandleUrgencyRequestFailed);
+        }
+
+        private void UnregisterUrgencyListeners()
+        {
+            if (requestUrgency != null)
+            {
+                requestUrgency.OnRequestFailed.RemoveListener(HandleUrgencyRequestFailed);
+            }
+        }
+
+        private void HandleUrgencyRequestFailed()
+        {
+            deskLockedByUrgency = true;
+            shortageActive = false;
+            heldItemType = null;
+            DestroyShortageIcon();
+            DestroyHeldItem();
+            SetCarryingAnimation(false);
+            SetSupplyMenuVisible(false);
+        }
+
         private void SetSupplyMenuVisible(bool visible)
         {
             if (supplyMenuRoot != null)
@@ -631,6 +681,11 @@ namespace RushBank.Gameplay
             if (audioSource == null)
             {
                 audioSource = GetComponent<AudioSource>();
+            }
+
+            if (requestUrgency == null)
+            {
+                requestUrgency = GetComponent<StaffRequestUrgency>();
             }
         }
     }

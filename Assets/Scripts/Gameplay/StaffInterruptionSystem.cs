@@ -28,6 +28,7 @@ namespace RushBank.Gameplay
         [SerializeField] private GameObject coworkerPrefab;
         [SerializeField] private GameObject urgentDocumentPrefab;
         [SerializeField] private ParticleSystem completionEffect;
+        [SerializeField] private StaffRequestUrgency requestUrgency;
 
         [Header("Counter Pause")]
         [SerializeField] private Behaviour[] pausableCounterSystems;
@@ -84,6 +85,12 @@ namespace RushBank.Gameplay
 
         private void OnDisable()
         {
+            if (requestUrgency != null)
+            {
+                requestUrgency.OnRequestFailed.RemoveListener(HandleUrgencyRequestFailed);
+                requestUrgency.ClearRequest();
+            }
+
             ResumePausedCounterTransaction();
         }
 
@@ -145,6 +152,7 @@ namespace RushBank.Gameplay
 
             PauseActiveCounterTransaction();
             activeDocument = SpawnUrgentDocument();
+            StartUrgencyRequest();
             SetState(StaffInterruptionState.TaskActive);
             routine = null;
         }
@@ -210,6 +218,45 @@ namespace RushBank.Gameplay
             body.mass = 0.2f;
             body.angularDamping = 4f;
             return document;
+        }
+
+        private void StartUrgencyRequest()
+        {
+            if (requestUrgency == null && activeCoworker != null)
+            {
+                requestUrgency = activeCoworker.GetComponent<StaffRequestUrgency>();
+                if (requestUrgency == null)
+                {
+                    requestUrgency = activeCoworker.AddComponent<StaffRequestUrgency>();
+                }
+            }
+
+            if (requestUrgency == null)
+            {
+                return;
+            }
+
+            requestUrgency.OnRequestFailed.RemoveListener(HandleUrgencyRequestFailed);
+            requestUrgency.OnRequestFailed.AddListener(HandleUrgencyRequestFailed);
+            requestUrgency.BeginRequest(activeCoworker != null ? activeCoworker.transform : transform);
+        }
+
+        private void HandleUrgencyRequestFailed()
+        {
+            if (activeDocument != null)
+            {
+                Destroy(activeDocument);
+                activeDocument = null;
+            }
+
+            ResumePausedCounterTransaction();
+
+            if (routine != null)
+            {
+                StopCoroutine(routine);
+            }
+
+            routine = StartCoroutine(ResolveAndLeave());
         }
 
         private void PauseActiveCounterTransaction()
@@ -354,6 +401,7 @@ namespace RushBank.Gameplay
                 completionEffect.Play();
             }
 
+            requestUrgency?.ResolveRequest();
             ResumePausedCounterTransaction();
             OnInterruptionCompleted.Invoke();
 
@@ -379,6 +427,11 @@ namespace RushBank.Gameplay
 
             ResetInterruptionTimer();
             SetState(StaffInterruptionState.Idle);
+            if (requestUrgency != null)
+            {
+                requestUrgency.OnRequestFailed.RemoveListener(HandleUrgencyRequestFailed);
+            }
+
             routine = null;
         }
 

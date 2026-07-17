@@ -43,6 +43,7 @@ Bu dosya, Unity prototipi için bilinen isterleri, eksikleri ve önerilen geliş
 - UIManager eklendi; Call Customer cooldown, CustomerRequest icon ve TimeRemaining slider temeli hazır.
 - CustomerPatience ve SecuritySystem eklendi; grumpy/raging müşteri durumları ve güvenlik çağırma akışı hazır.
 - CustomerPatience ve QueueCustomer yaş psikolojisi çarpanları eklendi; genç 0.7x, orta yaşlı 1.0x, yaşlı 1.5x sabır düşüş hızına sahip.
+- DynamicWeatherSystem eklendi; Sunny/Rainy hava dongusu, 3 sn isik gecisi, yagmur particle/audio feedback'i, Rainy durumda 1.15x sabir baskisi ve yeni spawn musterilere semsiye flag/aksesuar destegi hazir.
 - ThiefEventSystem eklendi; thief spawn, Call Police, TimeManager freeze ve polis escort akışı hazır.
 - LazyAssistantAI eklendi; ikinci gişede sıradaki müşteriyi yavaş servis eden geçici yardımcı akışı hazır.
 - LazyAssistantAI atıştırmalık mekaniği eklendi; oyuncu `SnackDrawer`dan snack alıp asistana yedirerek görev kapasitesini +1 artırabilir, her snack asistan servis süresini 1.2x yavaşlatır ve kurabiye göstergesi açar.
@@ -58,11 +59,14 @@ Bu dosya, Unity prototipi için bilinen isterleri, eksikleri ve önerilen geliş
 - QuestPoolDirector eklendi; gün bazlı görev ağırlıkları, maksimum 5 kişilik sıra doluluğu kontrolü, hırsız aktifken spawn durdurma ve kritik sürede quick-win görev boost'u hazır.
 - QuestSpawner eklendi; QuestData struct, aktif seviye görev listesi, 5-8 saniye random spawn, max queue capacity, hırsız aktifken spawn durdurma, kritik sürede cooldown azaltma ve quick-win ağırlık boost'u hazır.
 - StaffInterruptionSystem eklendi; rastgele iş arkadaşı kesintisi, aktif gişe işlemini pause/resume event'leriyle duraklatma, yaşa göre sabır baskısı ve ArchiveDesk evrak teslimi hazır.
+- StaffRequestUrgency eklendi; personel isteklerinde 30 saniyelik 1. derece sari ikon penceresi, 10 saniyelik 2. derece kirmizi/cift unlem kritik penceresi, basari odulleri, masa kilidi ve ManagerSatisfaction etkileri hazir.
 - CashDeliverySystem eklendi; 5 işlem kapasiteli `currentVaultCash`, Request Cash Dispatch butonu, vault `NO CASH` uyarısı, zırhlı araç spawn'ı, %20 yavaşlatan Super Cash Bag teslimi, golden cash explosion ve 1.5x bonus süre akışı hazır.
 - Cash flow dengesi eklendi; başarılı Deposit işlemleri kasayı +1 doldurur, Withdrawal işlemleri kasayı -1 azaltır.
 - PhoneInterruptionSystem eklendi; 30-45 saniye random telefon çalma, 4 saniyelik cevap penceresi, reaction-time çarpanı, 2 saniye time freeze ve kaçırılan çağrı cooldown akışı hazır.
+- TwoTierPhoneCallSystem eklendi; telefon aramalari Normal Musteri (%75, 15 sn, +40 Gold, +5 mudur memnuniyeti) ve Genel Mudurluk (%25, 7 sn, +200 Gold, +30 mudur memnuniyeti) olarak ayrildi; HQ basarisinda 20 sn 0.5x sabir ve 1.1x gold Corporate Grace, kacirmada -30 mudur memnuniyeti ve HQ Audit Failed overlay hazir.
 - TeaLadyBoostSystem eklendi; 50-70 saniye TeaLadyNPC spawn, yemeni/önlük/tepsi fallback teyze görseli, yalpalama ve el sallama hissi, TeasideTable'a steam/glow TeaCup bırakma, tıklanınca 8 saniye KafeinMode, +30% hız, sarı hız izi ve 0.6x işlem süresi çarpanı hazır.
 - TeaLadySystem/TeaLadyBoostSystem güncellendi; Drink seçimi 10 saniye 1.3x hız verir, Serve seçimi 3 porsiyonluk Tea Hospitality moduna geçer, müşterilere çay ikramı 40% sabır toparlar ve 8 saniye 0.7x sabır düşüşü uygular.
+- TeaLadyRefillEvent eklendi; Sadiye Abla 60-80 saniyede bir giseye gelip tek tiklik Refill Brew butonu acar, cozulurse +50 Gold, +10 mudur memnuniyeti ve 15 saniyelik 0.7x Fresh Brew sabir yavaslatma boost'u verir; 15 saniye bekletilirse -15 mudur memnuniyeti uygular.
 - AccountOpeningSystem eklendi; OpenAccount müşterisini 0.5 saniye stamp sonrası Relationship Manager Desk'e yönlendirir, ana gişe slotunu boşaltır ve sonraki 2 standart işlem timer'ını instant yapan Quick Boost verir.
 - InsuranceReferralSystem eklendi; InsuranceReferral müşterisini Sigortacıya Aktar butonuyla InsuranceSpecialistDesk'e yönlendirir, ana gişe slotunu boşaltır ve 12 saniye counter tabanlı işlem sürelerini 0.6x hızlandıran Teamwork Boost verir.
 - RedAlertRedirectionSystem eklendi; BarutCustomer 20% sabır ve 2x drain ile gelir, tıklanınca kuyruk önüne alınır, Acil Sevk ile Relationship Manager Desk'e gönderilir, +200 Gold ve kuyruktaki müşterilere 50% VIP Relief verir.
@@ -77,6 +81,8 @@ Bu dosya, Unity prototipi için bilinen isterleri, eksikleri ve önerilen geliş
 - ManagerSatisfactionSystem eklendi; müdür memnuniyet barı IT tamiri, kırtasiye teslimi, dolandırıcı yakalama, Barut müşteri sevki ve perfect işlemle dolar; gişe krizi ve dolandırıcıya yanlış onayla düşer; %100'de Staff Feast tetikleyip 20 saniye sabır freeze, 1.3x oyuncu hızı, 0.5x işlem süresi ve 2x yönlendirme hızı verir.
 - ScammerDetectionSystem eklendi; ScammerCustomer normal işlem ikonu arkasına saklanır, evrak inceleme panelinde fotoğraf/tarih/sahte mühür tutarsızlığı kontrol edilir, yanlış onayda -150 Gold ve FAILED AUDIT kilidi, doğru redde +50 Gold, güvenlik çağırmada +100 Gold ve 10 saniyelik Hero Employee sabır dondurma boost'u hazır.
 - CounterIncidentManager ve SecurityGuardAI eklendi; aktif gişe müşterisinin sabrı sıfırlanınca işlem UI/workflow iptali, -100 Gold cezası, AngryGesticulation feedback'i, güvenlik eskortu ve 10 saniyelik Panic Attack debuff akışı hazır.
+- SecurityGuardRequestEvent eklendi; Recai Abi 70-90 saniyede bir giseye telsiz/techizat istegiyle gelir, tek tiklik Charge Radio butonu acar, cozulurse +50 Gold, +10 mudur memnuniyeti, 25 saniyelik dolandirici evrak highlight'i ve 0.7x sabir rahatlatmasi verir; bekletilirse -15 mudur memnuniyeti uygular.
+- WetFloorAccidentSystem eklendi; Cayci Abla temizlik yaparken lobide islak zemin alanı olusturur, yeni giren musteriler %15 sansla kayip duser, tek tiklik Send Guard butonuyla Recai Abi kurtarmasi yapilir, +100 Gold, +15 mudur memnuniyeti ve 20 saniyelik 0.6x Compassionate Branch sabir boost'u verilir.
 - HeistRaidSystem eklendi; Super Cash Bag ile şubeye girince %10-15 nadir soygun roll'u, yamuk çorap maskeli 2-3 hırsız, konuşma/el sallama cue'ları, kırmızı/mavi göz cue, oyuncu diz titreme korku efekti, %50 yavaşlama, yakalanınca 2 saniye freeze cezası, alarm butonu, polis gelince çuval fırlatma ve tutuklama akışı hazır.
 - Kamera sistemi yok.
 - Etkileşim sistemi sahneye bağlanmadı.

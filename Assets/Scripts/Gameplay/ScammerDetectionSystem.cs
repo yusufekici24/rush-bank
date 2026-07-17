@@ -42,6 +42,7 @@ namespace RushBank.Gameplay
         [SerializeField] private Transform heroBoostParticleAnchor;
         [SerializeField] private Color auditFailureColor = new Color(1f, 0.12f, 0.08f);
         [SerializeField] private Color heroBoostColor = new Color(1f, 0.84f, 0.22f);
+        [SerializeField] private Color vigilanceHighlightColor = new Color(0.22f, 0.74f, 1f);
 
         [Header("Balance")]
         [SerializeField, Range(0f, 1f)] private float discrepancyChance = 0.5f;
@@ -64,19 +65,24 @@ namespace RushBank.Gameplay
         public UnityEvent<GameObject> OnScammerSecurityCalled = new UnityEvent<GameObject>();
         public UnityEvent OnHeroBoostStarted = new UnityEvent();
         public UnityEvent OnHeroBoostEnded = new UnityEvent();
+        public UnityEvent OnVigilanceHighlightStarted = new UnityEvent();
+        public UnityEvent OnVigilanceHighlightEnded = new UnityEvent();
 
         private QueueCustomer activeScammer;
         private ScammerDiscrepancy activeDiscrepancy = ScammerDiscrepancy.None;
         private Coroutine auditLockRoutine;
         private Coroutine heroBoostRoutine;
+        private Coroutine vigilanceHighlightRoutine;
         private GameObject activeFloatingText;
         private ParticleSystem activeHeroBoostParticle;
         private bool inspectionOpen;
         private bool counterLocked;
+        private bool vigilanceHighlightActive;
 
         public bool HasActiveScammer => activeScammer != null;
         public bool IsInspectionOpen => inspectionOpen;
         public bool IsCounterLocked => counterLocked;
+        public bool IsVigilanceHighlightActive => vigilanceHighlightActive;
         public ScammerDiscrepancy ActiveDiscrepancy => activeDiscrepancy;
 
         private void Awake()
@@ -132,6 +138,14 @@ namespace RushBank.Gameplay
             {
                 callSecurityButton.onClick.RemoveListener(CallSecurityForCurrentCustomer);
             }
+
+            if (vigilanceHighlightRoutine != null)
+            {
+                StopCoroutine(vigilanceHighlightRoutine);
+                vigilanceHighlightRoutine = null;
+            }
+
+            vigilanceHighlightActive = false;
         }
 
         private void Update()
@@ -237,6 +251,17 @@ namespace RushBank.Gameplay
             activeScammer = null;
         }
 
+        public void EnableDiscrepancyAutoHighlight(float seconds)
+        {
+            seconds = Mathf.Max(0.1f, seconds);
+            if (vigilanceHighlightRoutine != null)
+            {
+                StopCoroutine(vigilanceHighlightRoutine);
+            }
+
+            vigilanceHighlightRoutine = StartCoroutine(VigilanceHighlightRoutine(seconds));
+        }
+
         private void HandleCustomerCalled(GameObject customerObject)
         {
             if (customerObject == null || !customerObject.TryGetComponent<QueueCustomer>(out var customer))
@@ -252,7 +277,9 @@ namespace RushBank.Gameplay
             activeScammer = customer;
             activeDiscrepancy = RollDiscrepancy();
             inspectionOpen = false;
-            RefreshInspectionTexts("Press Inspect to review the customer document.");
+            RefreshInspectionTexts(vigilanceHighlightActive
+                ? "High Vigilance active. Suspicious document details will glow."
+                : "Press Inspect to review the customer document.");
         }
 
         private ScammerDiscrepancy RollDiscrepancy()
@@ -282,6 +309,9 @@ namespace RushBank.Gameplay
             if (statusText != null)
             {
                 statusText.text = status;
+                statusText.color = vigilanceHighlightActive && activeDiscrepancy != ScammerDiscrepancy.None
+                    ? vigilanceHighlightColor
+                    : Color.white;
             }
         }
 
@@ -297,7 +327,21 @@ namespace RushBank.Gameplay
                 ? "Stamp: silly cat-paw mark"
                 : "Stamp: official Rush Bank seal";
 
+            if (vigilanceHighlightActive)
+            {
+                photo = HighlightDiscrepancyLine(photo, ScammerDiscrepancy.PhotoMismatch);
+                expiration = HighlightDiscrepancyLine(expiration, ScammerDiscrepancy.ExpiredDate);
+                stamp = HighlightDiscrepancyLine(stamp, ScammerDiscrepancy.FakeStamp);
+            }
+
             return $"ID Card\nName: {customerName}\n{photo}\n{expiration}\n{stamp}";
+        }
+
+        private string HighlightDiscrepancyLine(string line, ScammerDiscrepancy discrepancy)
+        {
+            return activeDiscrepancy == discrepancy
+                ? $">>> CHECK THIS: {line} <<<"
+                : line;
         }
 
         private void ReleaseActiveScammer()
@@ -456,6 +500,29 @@ namespace RushBank.Gameplay
         {
             queueManager?.ResetQueueReliefBoost();
             DestroyHeroBoostParticle();
+        }
+
+        private IEnumerator VigilanceHighlightRoutine(float seconds)
+        {
+            vigilanceHighlightActive = true;
+            OnVigilanceHighlightStarted.Invoke();
+            if (HasActiveScammer)
+            {
+                RefreshInspectionTexts(activeDiscrepancy == ScammerDiscrepancy.None
+                    ? "High Vigilance active. No discrepancy detected yet."
+                    : "High Vigilance active. Suspicious document detail highlighted.");
+            }
+
+            yield return new WaitForSeconds(seconds);
+
+            vigilanceHighlightActive = false;
+            if (HasActiveScammer)
+            {
+                RefreshInspectionTexts("High Vigilance ended. Inspect manually.");
+            }
+
+            OnVigilanceHighlightEnded.Invoke();
+            vigilanceHighlightRoutine = null;
         }
 
         private void AddGold(int amount)

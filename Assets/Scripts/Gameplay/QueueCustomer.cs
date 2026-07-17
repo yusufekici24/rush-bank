@@ -51,6 +51,9 @@ namespace RushBank.Gameplay
         [SerializeField] private Renderer bodyRenderer;
         [SerializeField] private Transform requestIconAnchor;
         [SerializeField] private Image patienceFillImage;
+        [SerializeField] private GameObject umbrellaAccessory;
+        [SerializeField] private Transform umbrellaAnchor;
+        [SerializeField] private bool createFallbackUmbrellaWhenMissing = true;
 
         [Header("Age Psychology")]
         [SerializeField] private float youthPatienceDrainMultiplier = 0.7f;
@@ -61,10 +64,12 @@ namespace RushBank.Gameplay
         [SerializeField, Range(0.1f, 1f)] private float vipPatienceSecondsMultiplier = 0.55f;
 
         private GameObject requestIconInstance;
+        private GameObject fallbackUmbrellaInstance;
         private float patienceSeconds = 20f;
         private float patienceRemaining;
         private bool patienceRunning;
         private float patienceDrainMultiplier = 1f;
+        private bool hasUmbrella;
         private static float globalPatienceDrainMultiplier = 1f;
 
         public CustomerAgeGroup AgeGroup => ageGroup;
@@ -74,10 +79,14 @@ namespace RushBank.Gameplay
         public bool IsPatienceExpired => patienceRunning && patienceRemaining <= 0f;
         public float PatienceDrainMultiplier => patienceDrainMultiplier;
         public float AgePatienceDrainMultiplier => GetAgePatienceDrainMultiplier(ageGroup);
-        public float EffectivePatienceDrainMultiplier => patienceDrainMultiplier * AgePatienceDrainMultiplier * GlobalPatienceDrainMultiplier;
+        public float WeatherPatienceDrainMultiplier => DynamicWeatherSystem.Instance != null
+            ? DynamicWeatherSystem.Instance.activePatienceMultiplier
+            : 1f;
+        public float EffectivePatienceDrainMultiplier => patienceDrainMultiplier * AgePatienceDrainMultiplier * GlobalPatienceDrainMultiplier * WeatherPatienceDrainMultiplier;
         public bool IsVipRequest => requestKind == CustomerRequestKind.VipSafeRental;
         public bool IsScammer => requestKind == CustomerRequestKind.ScammerCustomer;
         public bool IsPhilanthropist => requestKind == CustomerRequestKind.PhilanthropistCustomer;
+        public bool HasUmbrella => hasUmbrella;
         public virtual float PatienceSecondsMultiplier => IsVipRequest ? vipPatienceSecondsMultiplier : 1f;
         public static float GlobalPatienceDrainMultiplier
         {
@@ -120,6 +129,7 @@ namespace RushBank.Gameplay
             }
 
             gameObject.name = $"Customer - {ageGroup} {gender} {requestKind}";
+            SetUmbrellaActive(DynamicWeatherSystem.Instance != null && DynamicWeatherSystem.Instance.HasUmbrellaForNewCustomers);
             OnInitialized();
         }
 
@@ -177,6 +187,31 @@ namespace RushBank.Gameplay
             UpdatePatienceBar();
         }
 
+        public void SetUmbrellaActive(bool active)
+        {
+            hasUmbrella = active;
+
+            if (umbrellaAccessory != null)
+            {
+                umbrellaAccessory.SetActive(active);
+                return;
+            }
+
+            if (!createFallbackUmbrellaWhenMissing)
+            {
+                return;
+            }
+
+            if (active)
+            {
+                EnsureFallbackUmbrella();
+            }
+            else
+            {
+                DestroyFallbackUmbrella();
+            }
+        }
+
         protected virtual void OnInitialized()
         {
         }
@@ -189,6 +224,65 @@ namespace RushBank.Gameplay
                 CustomerAgeGroup.Elderly => elderlyPatienceDrainMultiplier,
                 _ => middlePatienceDrainMultiplier
             };
+        }
+
+        private void EnsureFallbackUmbrella()
+        {
+            if (fallbackUmbrellaInstance != null)
+            {
+                fallbackUmbrellaInstance.SetActive(true);
+                return;
+            }
+
+            var anchor = umbrellaAnchor != null ? umbrellaAnchor : transform;
+            fallbackUmbrellaInstance = new GameObject("Rainy Umbrella");
+            fallbackUmbrellaInstance.transform.SetParent(anchor, false);
+            fallbackUmbrellaInstance.transform.localPosition = new Vector3(0.32f, 1.25f, 0.08f);
+            fallbackUmbrellaInstance.transform.localRotation = Quaternion.Euler(0f, 0f, -18f);
+
+            var canopy = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            canopy.name = "Canopy";
+            canopy.transform.SetParent(fallbackUmbrellaInstance.transform, false);
+            canopy.transform.localPosition = Vector3.up * 0.34f;
+            canopy.transform.localScale = new Vector3(0.48f, 0.16f, 0.48f);
+
+            var handle = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+            handle.name = "Handle";
+            handle.transform.SetParent(fallbackUmbrellaInstance.transform, false);
+            handle.transform.localPosition = Vector3.up * 0.04f;
+            handle.transform.localScale = new Vector3(0.025f, 0.32f, 0.025f);
+
+            ApplyUmbrellaMaterial(canopy, new Color(0.45f, 0.82f, 1f));
+            ApplyUmbrellaMaterial(handle, new Color(0.25f, 0.18f, 0.12f));
+            DisableUmbrellaCollider(canopy);
+            DisableUmbrellaCollider(handle);
+        }
+
+        private void DestroyFallbackUmbrella()
+        {
+            if (fallbackUmbrellaInstance != null)
+            {
+                Destroy(fallbackUmbrellaInstance);
+                fallbackUmbrellaInstance = null;
+            }
+        }
+
+        private static void ApplyUmbrellaMaterial(GameObject target, Color color)
+        {
+            if (target != null && target.TryGetComponent<Renderer>(out var rendererComponent))
+            {
+                var material = new Material(Shader.Find("Standard"));
+                material.color = color;
+                rendererComponent.sharedMaterial = material;
+            }
+        }
+
+        private static void DisableUmbrellaCollider(GameObject target)
+        {
+            if (target != null && target.TryGetComponent<Collider>(out var colliderComponent))
+            {
+                colliderComponent.enabled = false;
+            }
         }
 
         public void ShowRequestIcon(GameObject requestIconPrefab)

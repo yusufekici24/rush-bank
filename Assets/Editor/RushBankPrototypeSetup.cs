@@ -800,6 +800,7 @@ namespace RushBank.EditorTools
             var cashVaultRestockZone = CreateCashVaultStation(out var noCashWarningIcon, out var vaultCashExplosionEffect);
             CreateSnackDrawerStation();
             var teasideTable = CreateTeasideTableStation(out var cupPlacementPoint);
+            var rainWindowParticles = CreateRainWindowParticles();
             var heistEntranceTrigger = CreateHeistEntranceTrigger();
             var heistAlarmButton = CreateHeistAlarmButton();
             var player = CreatePlayerController(goldSparkleEffect);
@@ -809,6 +810,7 @@ namespace RushBank.EditorTools
             var spawnPoint = CreateMarker("Customer Spawn Point", new Vector3(-3.2f, 0.9f, 3.2f));
             var queueStartPoint = CreateMarker("Queue Start Point", new Vector3(-1.8f, 0.9f, 2.4f));
             var servicePoint = CreateMarker("Service Point", new Vector3(0f, 0.9f, -0.45f));
+            var wetFloorCenter = CreateMarker("Wet Floor Accident Center", new Vector3(-1.25f, 0.08f, 1.65f));
             var assistantCounterPoint = CreateMarker("Assistant Counter Point", new Vector3(-2.25f, 0.9f, -0.45f));
             var assistantBreakExit = CreateMarker("Assistant Break Exit", new Vector3(4.8f, 0.9f, -3.8f));
             var coworkerSpawnPoint = CreateMarker("Coworker Spawn Point", new Vector3(5.2f, 0.9f, -3.6f));
@@ -828,6 +830,7 @@ namespace RushBank.EditorTools
 
             var systems = new GameObject("Gameplay Systems");
             var scoreManager = systems.AddComponent<ScoreManager>();
+            var managerSatisfactionSystem = systems.AddComponent<ManagerSatisfactionSystem>();
             var queueDirector = systems.AddComponent<CustomerQueueDirector>();
             var queueManager = systems.AddComponent<QueueManager>();
             var securitySystem = systems.AddComponent<SecuritySystem>();
@@ -837,15 +840,31 @@ namespace RushBank.EditorTools
             var staffInterruptionSystem = systems.AddComponent<StaffInterruptionSystem>();
             var cashDeliverySystem = systems.AddComponent<CashDeliverySystem>();
             var phoneInterruptionSystem = systems.AddComponent<PhoneInterruptionSystem>();
+            var twoTierPhoneCallSystem = systems.AddComponent<TwoTierPhoneCallSystem>();
             var teaLadyBoostSystem = systems.AddComponent<TeaLadyBoostSystem>();
+            var teaLadyRefillEvent = systems.AddComponent<TeaLadyRefillEvent>();
+            var securityGuardRequestEvent = systems.AddComponent<SecurityGuardRequestEvent>();
+            var wetFloorAccidentSystem = systems.AddComponent<WetFloorAccidentSystem>();
             var heistRaidSystem = systems.AddComponent<HeistRaidSystem>();
             var preGameShopManager = systems.AddComponent<PreGameShopManager>();
+            var dynamicWeatherSystem = systems.AddComponent<DynamicWeatherSystem>();
             var phoneAudioSource = systems.AddComponent<AudioSource>();
+            var twoTierPhoneAudioSource = systems.AddComponent<AudioSource>();
             var heistAudioSource = systems.AddComponent<AudioSource>();
+            var weatherAudioSource = systems.AddComponent<AudioSource>();
+            var teaLadyRefillAudioSource = systems.AddComponent<AudioSource>();
+            var securityGuardRequestAudioSource = systems.AddComponent<AudioSource>();
+            var wetFloorAccidentAudioSource = systems.AddComponent<AudioSource>();
             var tellerService = systems.AddComponent<TellerServiceController>();
             var timeManager = systems.AddComponent<TimeManager>();
             queueDirector.enabled = false;
             questPoolDirector.enabled = false;
+
+            SetReference(dynamicWeatherSystem, "rainWindowParticles", rainWindowParticles);
+            SetReference(dynamicWeatherSystem, "rainAudioSource", weatherAudioSource);
+            SetFloat(dynamicWeatherSystem, "sunnyDuration", 90f);
+            SetFloat(dynamicWeatherSystem, "rainyDuration", 35f);
+            SetFloat(dynamicWeatherSystem, "rainyPatienceMultiplier", 1.15f);
 
             SetReference(queueDirector, "spawnPoint", spawnPoint);
             SetReference(queueDirector, "queueStartPoint", queueStartPoint);
@@ -858,12 +877,39 @@ namespace RushBank.EditorTools
             SetReference(tellerService, "scoreManager", scoreManager);
 
             var guard = CreateSecurityGuard();
+            var securityGuardAI = guard.GetComponent<SecurityGuardAI>();
+            if (securityGuardAI == null)
+            {
+                securityGuardAI = guard.gameObject.AddComponent<SecurityGuardAI>();
+            }
+
             var guardHome = CreateMarker("Security Guard Home", new Vector3(-4.5f, 0.9f, -2.8f));
             var securityExit = CreateMarker("Security Escort Exit", new Vector3(-5.2f, 0.9f, 3.8f));
             SetReference(securitySystem, "queueManager", queueManager);
             SetReference(securitySystem, "securityGuard", guard);
             SetReference(securitySystem, "guardHomePoint", guardHome);
             SetReference(securitySystem, "escortExitPoint", securityExit);
+            SetReference(securityGuardRequestEvent, "securityGuardAI", securityGuardAI);
+            SetReference(securityGuardRequestEvent, "lobbyPatrolArea", guardHome);
+            SetReference(securityGuardRequestEvent, "playerCounterLocation", coworkerCounterPoint);
+            SetReference(securityGuardRequestEvent, "queueManager", queueManager);
+            SetReference(securityGuardRequestEvent, "managerSatisfactionSystem", managerSatisfactionSystem);
+            SetReference(securityGuardRequestEvent, "audioSource", securityGuardRequestAudioSource);
+            SetFloat(securityGuardRequestEvent, "waitAtCounterSeconds", 15f);
+            SetFloat(securityGuardRequestEvent, "vigilanceBoostSeconds", 25f);
+            SetFloat(securityGuardRequestEvent, "vigilancePatienceDrainMultiplier", 0.7f);
+
+            SetReference(wetFloorAccidentSystem, "securityGuardAI", securityGuardAI);
+            SetReference(wetFloorAccidentSystem, "queueManager", queueManager);
+            SetReference(wetFloorAccidentSystem, "managerSatisfactionSystem", managerSatisfactionSystem);
+            SetReference(wetFloorAccidentSystem, "kitchenStation", teaLadySpawnPoint);
+            SetReference(wetFloorAccidentSystem, "lobbyPatrolArea", guardHome);
+            SetReference(wetFloorAccidentSystem, "wetFloorCenter", wetFloorCenter);
+            SetReference(wetFloorAccidentSystem, "audioSource", wetFloorAccidentAudioSource);
+            SetFloat(wetFloorAccidentSystem, "slipChance", 0.15f);
+            SetFloat(wetFloorAccidentSystem, "fallenPatienceDrainMultiplier", 3f);
+            SetFloat(wetFloorAccidentSystem, "compassionateBoostSeconds", 20f);
+            SetFloat(wetFloorAccidentSystem, "compassionatePatienceDrainMultiplier", 0.6f);
 
             var thiefSpawn = CreateMarker("Thief Spawn Point", new Vector3(-3.6f, 0.9f, 3.8f));
             var policeSpawn = CreateMarker("Police Spawn Point", new Vector3(-5.2f, 0.9f, -3.8f));
@@ -942,6 +988,17 @@ namespace RushBank.EditorTools
             CreateVIPEscortPrototype(player);
 
             SetReference(phoneInterruptionSystem, "audioSource", phoneAudioSource);
+            phoneInterruptionSystem.enabled = false;
+            SetReference(twoTierPhoneCallSystem, "queueManager", queueManager);
+            SetReference(twoTierPhoneCallSystem, "managerSatisfactionSystem", managerSatisfactionSystem);
+            SetReference(twoTierPhoneCallSystem, "scoreManager", scoreManager);
+            SetReference(twoTierPhoneCallSystem, "audioSource", twoTierPhoneAudioSource);
+            SetFloat(twoTierPhoneCallSystem, "normalAnswerWindowSeconds", 15f);
+            SetFloat(twoTierPhoneCallSystem, "headquartersAnswerWindowSeconds", 7f);
+            SetFloat(twoTierPhoneCallSystem, "headquartersChance", 0.25f);
+            SetFloat(twoTierPhoneCallSystem, "corporateGraceSeconds", 20f);
+            SetFloat(twoTierPhoneCallSystem, "corporatePatienceDrainMultiplier", 0.5f);
+            SetFloat(twoTierPhoneCallSystem, "corporateGoldMultiplier", 1.1f);
             SetReference(teaLadyBoostSystem, "raycastCamera", Camera.main);
             SetReference(teaLadyBoostSystem, "teaLadySpawnPoint", teaLadySpawnPoint);
             SetReference(teaLadyBoostSystem, "teaLadyExitPoint", teaLadyExitPoint);
@@ -953,6 +1010,16 @@ namespace RushBank.EditorTools
             SetReference(teaLadyBoostSystem, "utilityBillSystem", player.GetComponent<UtilityBillSystem>());
             SetReference(teaLadyBoostSystem, "documentProcessWorkflow", player.GetComponent<DocumentProcessWorkflow>());
             SetReference(teaLadyBoostSystem, "goldExchangeWorkflow", player.GetComponent<GoldExchangeWorkflow>());
+
+            SetReference(teaLadyRefillEvent, "kitchenStation", teaLadySpawnPoint);
+            SetReference(teaLadyRefillEvent, "playerCounterLocation", coworkerCounterPoint);
+            SetReference(teaLadyRefillEvent, "queueSteamAnchor", queueStartPoint);
+            SetReference(teaLadyRefillEvent, "queueManager", queueManager);
+            SetReference(teaLadyRefillEvent, "managerSatisfactionSystem", managerSatisfactionSystem);
+            SetReference(teaLadyRefillEvent, "audioSource", teaLadyRefillAudioSource);
+            SetFloat(teaLadyRefillEvent, "waitAtCounterSeconds", 15f);
+            SetFloat(teaLadyRefillEvent, "freshBrewBoostSeconds", 15f);
+            SetFloat(teaLadyRefillEvent, "freshBrewPatienceDrainMultiplier", 0.7f);
 
             SetReference(preGameShopManager, "timeManager", timeManager);
             SetReference(preGameShopManager, "mobilePlayerController", player.GetComponent<MobilePlayerController>());
@@ -1332,6 +1399,41 @@ namespace RushBank.EditorTools
             placement.transform.localPosition = new Vector3(0f, 0.62f, 0f);
             cupPlacementPoint = placement.transform;
             return table.transform;
+        }
+
+        private static ParticleSystem CreateRainWindowParticles()
+        {
+            var rainObject = new GameObject("Window Rain Particles Prototype");
+            rainObject.transform.position = new Vector3(0f, 2.25f, 3.95f);
+            rainObject.transform.rotation = Quaternion.Euler(12f, 0f, 0f);
+
+            var particles = rainObject.AddComponent<ParticleSystem>();
+            var main = particles.main;
+            main.loop = true;
+            main.duration = 4f;
+            main.startLifetime = new ParticleSystem.MinMaxCurve(0.55f, 1.1f);
+            main.startSpeed = new ParticleSystem.MinMaxCurve(0.65f, 1.35f);
+            main.startSize = new ParticleSystem.MinMaxCurve(0.018f, 0.045f);
+            main.startColor = new ParticleSystem.MinMaxGradient(
+                new Color(0.62f, 0.78f, 1f, 0.45f),
+                new Color(0.85f, 0.94f, 1f, 0.72f));
+            main.maxParticles = 220;
+            main.simulationSpace = ParticleSystemSimulationSpace.World;
+
+            var emission = particles.emission;
+            emission.rateOverTime = 70f;
+
+            var shape = particles.shape;
+            shape.shapeType = ParticleSystemShapeType.Box;
+            shape.scale = new Vector3(6.2f, 1.9f, 0.08f);
+
+            var velocity = particles.velocityOverLifetime;
+            velocity.enabled = true;
+            velocity.y = new ParticleSystem.MinMaxCurve(-1.35f, -0.65f);
+            velocity.x = new ParticleSystem.MinMaxCurve(-0.08f, 0.08f);
+
+            particles.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+            return particles;
         }
 
         private static Collider CreateHeistEntranceTrigger()
