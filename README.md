@@ -7,7 +7,7 @@ Proje PR akisi ile gelistirilir. `main` branch'ine dogrudan push yapilmaz. Degis
 ## Mevcut Durum
 
 - Unity surumu: `6000.0.23f1`
-- Aktif branch: `feature/playable-prototype-setup`
+- Aktif calisma branch'i: `feature/dynamic-weather-system`
 - Temel Unity klasorleri hazir: `Assets`, `Packages`, `ProjectSettings`
 - Prototype setup araci hazir: `RushBank > Setup Prototype Scenes`
 - Core gameplay, kriz, meta-game, uzman masa ve gunluk gorev sistemleri script seviyesinde hazir
@@ -98,6 +98,7 @@ Secilen sube `PlayerPrefs` ile saklanir. Oyun sahnesi yuklenince spawn araligi, 
 - `CustomerPatience`: Calm, Grumpy, Raging durumlari ve yas bazli sabir carpani.
 - `QuestSpawner`: seviye/gun bazli gorev havuzu, weighted spawn ve dynamic pacing.
 - `QuestPoolDirector`: gorev agirliklari, kritik sure quick-win agirligi ve spawn interval boostlari.
+- `DynamicWeatherSystem`: Sunny/Rainy hava dongusu, yagmurda 1.15x sabir baskisi, isik/audio/particle gecisi ve semsiye flag'i.
 - `CustomerQueueDirector`: eski/prototype musteri akisi icin destekleyici sistem.
 
 ## Islem Sistemleri
@@ -139,13 +140,18 @@ Secilen sube `PlayerPrefs` ile saklanir. Oyun sahnesi yuklenince spawn araligi, 
 - `HeistRaidSystem`: nakit teslim donusunde nadir stealth soygun baskini.
 - `CounterIncidentManager`: aktif gise sabri bitince meltdown, -100 Gold, security escort ve Panic Attack debuff.
 - `SecurityGuardAI`: kizgin musteri veya dolandirici gibi hedefleri disari goturen guvenlik akisi.
+- `SecurityGuardRequestEvent`: Recai Abi'nin ara sira giseye telsiz/teçhizat istegiyle gelmesi, tek tiklik Charge Radio butonu, +50 Gold, +10 mudur memnuniyeti, 25 sn High Vigilance dolandirici highlight'i ve 0.7x sabir rahatlatmasi.
+- `WetFloorAccidentSystem`: Cayci Abla temizlik yaparken olusan islak zemin kazasi, dusen musteriyi tek butonla Recai Abi'ye yonlendirme, +100 Gold, +15 mudur memnuniyeti ve 20 sn Compassionate Branch sabir boost'u.
 - `ScammerDetectionSystem`: sahte evrak/foto/tarih kontrolu, decline/security/approve sonuclari.
 - `PhoneInterruptionSystem`: 30-45 saniyelik telefon refleks eventi ve sure carpani.
+- `TwoTierPhoneCallSystem`: telefonu Normal Musteri ve Genel Mudurluk aramasi olarak iki seviyeye ayirir; HQ aramasinda 7 sn cevap penceresi, +200 Gold, +30 mudur memnuniyeti, 20 sn Corporate Grace sabir/gold boost'u ve kacarsa HQ Audit Failed cezasi.
 - `StaffInterruptionSystem`: is arkadasi kesintisi ve ArchiveDesk evrak teslimi.
+- `StaffRequestUrgency`: personel isteklerine 1. derece / 2. derece aciliyet katmani ekler; sari ikon 30 sn rutin pencere, kirmizi yuz + cift unlem 10 sn kritik pencere, basari/kriz odulleri ve mudur memnuniyeti etkileri.
 - `ManagerITSupportEvent`: mudurun bilgisayar arizasi, mini-game tamiri, +150 Gold ve Manager Grace Boost.
 - `ManagerSatisfactionSystem`: mudur memnuniyet bari, Staff Feast, sabir freeze, hiz ve islem boostlari.
 - `BankCatChaosSystem`: Pati kedisi, kuyruk sakinlestirme, panik, guvenlik kovalamacasi.
 - `TeaLadyBoostSystem`: cay/kahve power-up, KafeinMode, Drink/Serve secimi ve Tea Hospitality.
+- `TeaLadyRefillEvent`: cay/kahve bitince Sadiye Abla'nin giseye gelip tek tiklik Refill Brew istegi acmasi, +50 Gold, +10 mudur memnuniyeti ve 15 sn Fresh Brew sabir yavaslatma boost'u.
 - `TeaLadySystem`: cayci teyze teslimati icin alternatif/legacy destek.
 - `LazyAssistantAI`: ikinci gise icin yavas ama otomatik yardimci.
 - `AssistantManager`: kuyruk grumpiness seviyesine gore dolan SummonBar.
