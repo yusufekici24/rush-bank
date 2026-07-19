@@ -1,4 +1,5 @@
 using RushBank.Art;
+using RushBank.Core;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -42,6 +43,7 @@ namespace RushBank.Gameplay
             root.SetParent(transform, false);
 
             BuildShell(root);
+            BuildPlayAreaBarriers(root);
             BuildCounterArea(root);
             BuildQueueArea(root);
             BuildBackWallDressing(root);
@@ -49,6 +51,7 @@ namespace RushBank.Gameplay
             BuildCeilingLights(root);
             TuneLightingAndCamera();
             EnsureSkinner();
+            EnsurePlayAreaLimiter();
         }
 
         private void BuildShell(Transform root)
@@ -63,6 +66,24 @@ namespace RushBank.Gameplay
             RushBankArtLibrary.Shape(PrimitiveType.Cube, root, "Baseboard Left", new Vector3(-5.87f, 0.09f, -4f), new Vector3(0.06f, 0.18f, 17.85f), baseboard);
             RushBankArtLibrary.Shape(PrimitiveType.Cube, root, "Baseboard Right", new Vector3(5.87f, 0.09f, -4f), new Vector3(0.06f, 0.18f, 17.85f), baseboard);
             RushBankArtLibrary.Shape(PrimitiveType.Cube, root, "Front Floor Lip", new Vector3(0f, 0.025f, -12.96f), new Vector3(12f, 0.06f, 0.18f), baseboard);
+        }
+
+        private static void BuildPlayAreaBarriers(Transform root)
+        {
+            // Zeminin kamera tarafındaki açık kenarını kapatır; karakter sahne dışına yürüyemez.
+            CreateInvisibleBarrier(root, "Play Area Barrier Front", new Vector3(0f, 1.5f, -13.1f), new Vector3(12.4f, 3f, 0.2f));
+            CreateInvisibleBarrier(root, "Play Area Barrier Left", new Vector3(-6.1f, 1.5f, -4f), new Vector3(0.2f, 3f, 18.4f));
+            CreateInvisibleBarrier(root, "Play Area Barrier Right", new Vector3(6.1f, 1.5f, -4f), new Vector3(0.2f, 3f, 18.4f));
+            CreateInvisibleBarrier(root, "Play Area Barrier Back", new Vector3(0f, 1.5f, 5.1f), new Vector3(12.4f, 3f, 0.2f));
+        }
+
+        private static void CreateInvisibleBarrier(Transform root, string name, Vector3 position, Vector3 size)
+        {
+            var barrier = new GameObject(name);
+            barrier.transform.SetParent(root, false);
+            barrier.transform.localPosition = position;
+            var boxCollider = barrier.AddComponent<BoxCollider>();
+            boxCollider.size = size;
         }
 
         private void BuildCounterArea(Transform root)
@@ -382,9 +403,17 @@ namespace RushBank.Gameplay
             }
 
             var camera = Camera.main;
-            if (camera != null && camera.clearFlags == CameraClearFlags.SolidColor)
+            if (camera != null)
             {
-                camera.backgroundColor = new Color(0.12f, 0.14f, 0.14f);
+                if (camera.clearFlags == CameraClearFlags.SolidColor)
+                {
+                    camera.backgroundColor = new Color(0.12f, 0.14f, 0.14f);
+                }
+
+                if (camera.orthographic && camera.GetComponent<PortraitCameraFitter>() == null)
+                {
+                    camera.gameObject.AddComponent<PortraitCameraFitter>();
+                }
             }
         }
 
@@ -393,6 +422,21 @@ namespace RushBank.Gameplay
             if (FindFirstObjectByType<ChubbyVisualSkinner>() == null)
             {
                 gameObject.AddComponent<ChubbyVisualSkinner>();
+            }
+        }
+
+        private static void EnsurePlayAreaLimiter()
+        {
+            var controller = FindFirstObjectByType<ChubbyTopDownInputController>();
+            if (controller != null && controller.GetComponent<PlayAreaLimiter>() == null)
+            {
+                controller.gameObject.AddComponent<PlayAreaLimiter>();
+            }
+
+            var mobileController = FindFirstObjectByType<MobilePlayerController>();
+            if (mobileController != null && mobileController.GetComponent<PlayAreaLimiter>() == null)
+            {
+                mobileController.gameObject.AddComponent<PlayAreaLimiter>();
             }
         }
 

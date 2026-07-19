@@ -784,7 +784,10 @@ namespace RushBank.EditorTools
             CustomerDefinition[] customerSequence)
         {
             var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
-            CreateCamera(new Vector3(0f, 10.2f, -10.35f), Quaternion.Euler(50f, 0f, 0f), new Color(0.12f, 0.14f, 0.14f));
+            var gameCamera = CreateCamera(new Vector3(0f, 10.2f, -10.35f), Quaternion.Euler(50f, 0f, 0f), new Color(0.12f, 0.14f, 0.14f));
+            var cameraFitter = gameCamera.gameObject.AddComponent<PortraitCameraFitter>();
+            SetFloat(cameraFitter, "targetHalfWidth", 6.2f);
+            SetFloat(cameraFitter, "minOrthographicSize", 8.65f);
             CreateDirectionalLight();
 
             var environmentObject = new GameObject("Prototype Bank Environment");
@@ -804,6 +807,9 @@ namespace RushBank.EditorTools
             var heistEntranceTrigger = CreateHeistEntranceTrigger();
             var heistAlarmButton = CreateHeistAlarmButton();
             var player = CreatePlayerController(goldSparkleEffect);
+            var playAreaLimiter = player.gameObject.AddComponent<PlayAreaLimiter>();
+            SetVector3(playAreaLimiter, "areaCenter", new Vector3(0f, 1f, -4.05f));
+            SetVector3(playAreaLimiter, "areaSize", new Vector3(10.8f, 4f, 16.8f));
             var playerInteraction = player.GetComponentInChildren<PlayerInteraction>();
             var bankingActionSystem = player.GetComponent<BankingActionSystem>();
 
