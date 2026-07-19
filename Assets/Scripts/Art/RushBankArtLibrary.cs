@@ -6,25 +6,25 @@ namespace RushBank.Art
 {
     public static class RushBankArtLibrary
     {
-        public static readonly Color BankGreen = new Color(0.09f, 0.63f, 0.35f);
-        public static readonly Color BankGreenDark = new Color(0.05f, 0.42f, 0.24f);
-        public static readonly Color Gold = new Color(0.95f, 0.79f, 0.30f);
-        public static readonly Color Cream = new Color(0.97f, 0.95f, 0.92f);
-        public static readonly Color FloorLight = new Color(0.93f, 0.89f, 0.82f);
-        public static readonly Color FloorDark = new Color(0.86f, 0.81f, 0.71f);
-        public static readonly Color WallUpper = new Color(0.94f, 0.92f, 0.86f);
-        public static readonly Color WallLower = new Color(0.83f, 0.79f, 0.70f);
-        public static readonly Color CounterDark = new Color(0.18f, 0.23f, 0.24f);
-        public static readonly Color WoodWarm = new Color(0.73f, 0.54f, 0.35f);
-        public static readonly Color WoodDark = new Color(0.54f, 0.39f, 0.25f);
+        public static readonly Color BankGreen = new Color(0.18f, 0.48f, 0.34f);
+        public static readonly Color BankGreenDark = new Color(0.12f, 0.32f, 0.25f);
+        public static readonly Color Gold = new Color(0.78f, 0.63f, 0.34f);
+        public static readonly Color Cream = new Color(0.90f, 0.88f, 0.82f);
+        public static readonly Color FloorLight = new Color(0.74f, 0.70f, 0.62f);
+        public static readonly Color FloorDark = new Color(0.62f, 0.58f, 0.50f);
+        public static readonly Color WallUpper = new Color(0.82f, 0.79f, 0.70f);
+        public static readonly Color WallLower = new Color(0.62f, 0.57f, 0.48f);
+        public static readonly Color CounterDark = new Color(0.20f, 0.22f, 0.21f);
+        public static readonly Color WoodWarm = new Color(0.62f, 0.46f, 0.30f);
+        public static readonly Color WoodDark = new Color(0.42f, 0.31f, 0.22f);
         public static readonly Color RopeRed = new Color(0.55f, 0.18f, 0.22f);
         public static readonly Color SlateDark = new Color(0.14f, 0.15f, 0.18f);
         public static readonly Color Navy = new Color(0.13f, 0.20f, 0.29f);
         public static readonly Color LeafGreen = new Color(0.24f, 0.55f, 0.28f);
         public static readonly Color LeafGreenLight = new Color(0.36f, 0.68f, 0.34f);
         public static readonly Color PotTerracotta = new Color(0.71f, 0.35f, 0.23f);
-        public static readonly Color WarmLight = new Color(1f, 0.91f, 0.77f);
-        public static readonly Color SkyGlass = new Color(0.75f, 0.89f, 1f);
+        public static readonly Color WarmLight = new Color(0.88f, 0.76f, 0.58f);
+        public static readonly Color SkyGlass = new Color(0.56f, 0.70f, 0.76f);
         public static readonly Color EyeWhite = new Color(0.98f, 0.98f, 0.98f);
         public static readonly Color EyePupil = new Color(0.15f, 0.15f, 0.18f);
         public static readonly Color Blush = new Color(0.95f, 0.65f, 0.62f);
@@ -213,7 +213,7 @@ namespace RushBank.Art
             {
                 try
                 {
-                    labelFont = Resources.GetBuiltinResource<Font>("Arial.ttf");
+                    labelFont = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
                 }
                 catch (System.Exception)
                 {

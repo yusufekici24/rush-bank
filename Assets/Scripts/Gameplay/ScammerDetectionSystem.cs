@@ -553,7 +553,7 @@ namespace RushBank.Gameplay
             activeFloatingText = new GameObject("Scammer Detection Floating Text");
             activeFloatingText.transform.SetParent(targetCanvas.transform, false);
             var label = activeFloatingText.AddComponent<Text>();
-            label.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+            label.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
             label.text = message;
             label.alignment = TextAnchor.MiddleCenter;
             label.fontSize = 32;
@@ -656,7 +656,7 @@ namespace RushBank.Gameplay
             textObject.transform.SetParent(inspectionPanel.transform, false);
 
             var text = textObject.AddComponent<Text>();
-            text.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+            text.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
             text.alignment = TextAnchor.MiddleCenter;
             text.fontSize = fontSize;
             text.color = Color.white;

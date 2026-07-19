@@ -784,7 +784,7 @@ namespace RushBank.EditorTools
             CustomerDefinition[] customerSequence)
         {
             var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
-            CreateCamera(new Vector3(0f, 3.2f, -6.4f), Quaternion.Euler(24f, 0f, 0f), new Color(0.07f, 0.08f, 0.09f));
+            CreateCamera(new Vector3(0f, 10.2f, -10.35f), Quaternion.Euler(50f, 0f, 0f), new Color(0.12f, 0.14f, 0.14f));
             CreateDirectionalLight();
 
             var environmentObject = new GameObject("Prototype Bank Environment");
@@ -809,12 +809,12 @@ namespace RushBank.EditorTools
 
             var spawnPoint = CreateMarker("Customer Spawn Point", new Vector3(-3.2f, 0.9f, 3.2f));
             var queueStartPoint = CreateMarker("Queue Start Point", new Vector3(-1.8f, 0.9f, 2.4f));
-            var servicePoint = CreateMarker("Service Point", new Vector3(0f, 0.9f, -0.45f));
+            var servicePoint = CreateMarker("Service Point", new Vector3(0f, 0.9f, -7.55f));
             var wetFloorCenter = CreateMarker("Wet Floor Accident Center", new Vector3(-1.25f, 0.08f, 1.65f));
-            var assistantCounterPoint = CreateMarker("Assistant Counter Point", new Vector3(-2.25f, 0.9f, -0.45f));
+            var assistantCounterPoint = CreateMarker("Assistant Counter Point", new Vector3(-2.25f, 0.9f, -7.55f));
             var assistantBreakExit = CreateMarker("Assistant Break Exit", new Vector3(4.8f, 0.9f, -3.8f));
             var coworkerSpawnPoint = CreateMarker("Coworker Spawn Point", new Vector3(5.2f, 0.9f, -3.6f));
-            var coworkerCounterPoint = CreateMarker("Coworker Counter Interruption Point", new Vector3(0.95f, 0.9f, -0.95f));
+            var coworkerCounterPoint = CreateMarker("Coworker Counter Interruption Point", new Vector3(0.95f, 0.9f, -8.05f));
             var coworkerExitPoint = CreateMarker("Coworker Exit Point", new Vector3(5.2f, 0.9f, 3.8f));
             var armoredVehicleSpawnPoint = CreateMarker("Armored Cash Vehicle Spawn Point", new Vector3(-4.9f, 0.65f, 5.8f));
             var armoredVehicleParkingPoint = CreateMarker("Armored Cash Vehicle Parking Point", new Vector3(-3.25f, 0.65f, 4.35f));
@@ -883,7 +883,7 @@ namespace RushBank.EditorTools
                 securityGuardAI = guard.gameObject.AddComponent<SecurityGuardAI>();
             }
 
-            var guardHome = CreateMarker("Security Guard Home", new Vector3(-4.5f, 0.9f, -2.8f));
+            var guardHome = CreateMarker("Security Guard Home", new Vector3(-3.75f, 0.9f, 3.75f));
             var securityExit = CreateMarker("Security Escort Exit", new Vector3(-5.2f, 0.9f, 3.8f));
             SetReference(securitySystem, "queueManager", queueManager);
             SetReference(securitySystem, "securityGuard", guard);
@@ -1070,6 +1070,8 @@ namespace RushBank.EditorTools
             camera.transform.SetPositionAndRotation(position, rotation);
             camera.clearFlags = CameraClearFlags.SolidColor;
             camera.backgroundColor = backgroundColor;
+            camera.orthographic = true;
+            camera.orthographicSize = 8.65f;
             return camera.transform;
         }
 
@@ -1077,7 +1079,7 @@ namespace RushBank.EditorTools
         {
             var player = GameObject.CreatePrimitive(PrimitiveType.Capsule);
             player.name = "Player Controller Prototype";
-            player.transform.position = new Vector3(0f, 1f, -3.2f);
+            player.transform.position = new Vector3(0f, 1f, -10.3f);
 
             var body = player.AddComponent<Rigidbody>();
             body.mass = 1.2f;
@@ -1133,12 +1135,12 @@ namespace RushBank.EditorTools
         {
             CreateInteractableCube(
                 "Money Bag Prototype",
-                new Vector3(-1.4f, 0.35f, -2.2f),
+                new Vector3(-1.4f, 0.35f, -9.3f),
                 new Vector3(0.55f, 0.55f, 0.55f),
                 new Color(0.13f, 0.55f, 0.27f));
             CreateInteractableCube(
                 "File Folder Prototype",
-                new Vector3(1.2f, 0.2f, -2.1f),
+                new Vector3(1.2f, 0.2f, -9.2f),
                 new Vector3(0.75f, 0.18f, 0.5f),
                 new Color(0.94f, 0.68f, 0.22f));
         }
@@ -1171,7 +1173,7 @@ namespace RushBank.EditorTools
             var desk = GameObject.CreatePrimitive(PrimitiveType.Cube);
             desk.name = "Delivery Desk Prototype";
             desk.tag = "Counter";
-            desk.transform.position = new Vector3(2.4f, 0.45f, -0.8f);
+            desk.transform.position = new Vector3(2.4f, 0.45f, -7.9f);
             desk.transform.localScale = new Vector3(1.4f, 0.9f, 1.1f);
 
             var renderer = desk.GetComponent<Renderer>();
@@ -1204,14 +1206,14 @@ namespace RushBank.EditorTools
             CreateStationCube(
                 "Document Desk Prototype",
                 "DocumentDesk",
-                new Vector3(-2.7f, 0.45f, -3.0f),
+                new Vector3(-2.7f, 0.45f, -9.45f),
                 new Vector3(1.5f, 0.9f, 1.0f),
                 new Color(0.35f, 0.55f, 0.95f));
 
             CreateStationCube(
                 "Manager Desk Prototype",
                 "ManagerDesk",
-                new Vector3(4.0f, 0.45f, 1.6f),
+                new Vector3(5.05f, 0.45f, -1.35f),
                 new Vector3(1.7f, 0.9f, 1.1f),
                 new Color(0.65f, 0.42f, 0.95f));
         }
@@ -1221,7 +1223,7 @@ namespace RushBank.EditorTools
             var desk = CreateStationCube(
                 "Archive Desk Prototype",
                 "ArchiveDesk",
-                new Vector3(4.35f, 0.45f, -2.75f),
+                new Vector3(5.05f, 0.45f, -3.35f),
                 new Vector3(1.45f, 0.9f, 1.05f),
                 new Color(0.95f, 0.56f, 0.34f));
 
@@ -1240,7 +1242,7 @@ namespace RushBank.EditorTools
             var station = CreateStationCube(
                 "Gold Expertise Station Prototype",
                 "ExpertiseStation",
-                new Vector3(-4.1f, 0.45f, 1.7f),
+                new Vector3(-5.05f, 0.45f, -3.35f),
                 new Vector3(1.6f, 0.9f, 1.1f),
                 new Color(1f, 0.78f, 0.22f));
 
@@ -1262,7 +1264,7 @@ namespace RushBank.EditorTools
             CreateStationCube(
                 "Passbook Printer Prototype",
                 "PassbookPrinter",
-                new Vector3(2.7f, 0.55f, -2.8f),
+                new Vector3(2.7f, 0.55f, -9.9f),
                 new Vector3(0.9f, 1.1f, 0.8f),
                 new Color(0.32f, 0.72f, 0.95f));
         }
@@ -1272,7 +1274,7 @@ namespace RushBank.EditorTools
             var scanner = CreateStationCube(
                 "Barcode Scanner Prototype",
                 "BarcodeScanner",
-                new Vector3(1.65f, 0.72f, -2.15f),
+                new Vector3(1.65f, 0.72f, -9.25f),
                 new Vector3(0.58f, 0.34f, 0.52f),
                 new Color(0.14f, 0.16f, 0.18f));
 
@@ -1351,7 +1353,7 @@ namespace RushBank.EditorTools
             var drawer = CreateStationCube(
                 "Snack Drawer Prototype",
                 "SnackDrawer",
-                new Vector3(0.85f, 0.28f, -1.42f),
+                new Vector3(0.85f, 0.28f, -8.52f),
                 new Vector3(0.75f, 0.32f, 0.48f),
                 new Color(0.62f, 0.36f, 0.18f));
 
@@ -1557,11 +1559,11 @@ namespace RushBank.EditorTools
                 new Vector3(1.8f, 1.5f, 1.4f),
                 new Color(0.24f, 0.8f, 0.55f, 0.18f));
 
-            var playerCounter = CreateMarker("VIP Triangle PlayerCounter", new Vector3(0f, 0.9f, -0.45f));
+            var playerCounter = CreateMarker("VIP Triangle PlayerCounter", new Vector3(0f, 0.9f, -7.55f));
             var vipWaitingSpot = CreateMarker("VIP Triangle VIPWaitingSpot", new Vector3(-1.45f, 0.9f, 1.35f));
-            var managerRoomEntrance = CreateMarker("VIP Triangle ManagerRoomEntrance", new Vector3(3.35f, 0.9f, -1.85f));
-            var vaultInsidePoint = CreateMarker("VIP Manager Room Meeting Point", new Vector3(3.55f, 0.9f, -2.2f));
-            var vaultExitPoint = CreateMarker("VIP Manager Room Exit Point", new Vector3(2.8f, 0.9f, -1.35f));
+            var managerRoomEntrance = CreateMarker("VIP Triangle ManagerRoomEntrance", new Vector3(5.05f, 0.9f, -1.35f));
+            var vaultInsidePoint = CreateMarker("VIP Manager Room Meeting Point", new Vector3(5.25f, 0.9f, -1.75f));
+            var vaultExitPoint = CreateMarker("VIP Manager Room Exit Point", new Vector3(4.45f, 0.9f, -0.95f));
 
             var managerDoor = GameObject.CreatePrimitive(PrimitiveType.Cube);
             managerDoor.name = "VIP Manager Room Closed Door Cue";
@@ -1577,7 +1579,7 @@ namespace RushBank.EditorTools
 
             managerDoor.SetActive(false);
 
-            var praiseBubbleAnchor = CreateMarker("Managerial Praise Bubble Anchor", new Vector3(3.35f, 1.55f, -1.15f));
+            var praiseBubbleAnchor = CreateMarker("Managerial Praise Bubble Anchor", new Vector3(5.05f, 1.55f, -0.75f));
             var praiseAudioSource = managerDoor.AddComponent<AudioSource>();
             praiseAudioSource.playOnAwake = false;
 
@@ -1736,6 +1738,7 @@ namespace RushBank.EditorTools
             var scaler = canvasObject.AddComponent<UnityEngine.UI.CanvasScaler>();
             scaler.uiScaleMode = UnityEngine.UI.CanvasScaler.ScaleMode.ScaleWithScreenSize;
             scaler.referenceResolution = new Vector2(1080f, 1920f);
+            scaler.matchWidthOrHeight = 0.5f;
             canvasObject.AddComponent<UnityEngine.UI.GraphicRaycaster>();
 
             var sliderObject = new GameObject("Time Remaining Slider");
@@ -1749,7 +1752,7 @@ namespace RushBank.EditorTools
             sliderRect.anchorMax = new Vector2(0.5f, 1f);
             sliderRect.pivot = new Vector2(0.5f, 1f);
             sliderRect.anchoredPosition = new Vector2(0f, -24f);
-            sliderRect.sizeDelta = new Vector2(420f, 28f);
+            sliderRect.sizeDelta = new Vector2(760f, 42f);
 
             var timerObject = new GameObject("Timer Text");
             timerObject.transform.SetParent(canvasObject.transform, false);
@@ -1763,7 +1766,7 @@ namespace RushBank.EditorTools
 
             var text = timerObject.AddComponent<TextMeshProUGUI>();
             text.text = "01:00";
-            text.fontSize = 40f;
+            text.fontSize = 56f;
             text.alignment = TextAlignmentOptions.Center;
             text.color = Color.white;
 
@@ -1772,10 +1775,10 @@ namespace RushBank.EditorTools
             var lockObject = new GameObject("Freeze Lock Icon");
             lockObject.transform.SetParent(canvasObject.transform, false);
             var lockText = lockObject.AddComponent<UnityEngine.UI.Text>();
-            lockText.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+            lockText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
             lockText.text = "LOCK";
             lockText.alignment = TextAnchor.MiddleCenter;
-            lockText.fontSize = 24;
+            lockText.fontSize = 30;
             lockText.fontStyle = FontStyle.Bold;
             lockText.color = new Color(0.35f, 0.75f, 1f);
             lockObject.SetActive(false);
@@ -1784,16 +1787,16 @@ namespace RushBank.EditorTools
             lockRect.anchorMax = new Vector2(0.5f, 1f);
             lockRect.pivot = new Vector2(0.5f, 1f);
             lockRect.anchoredPosition = new Vector2(118f, -32f);
-            lockRect.sizeDelta = new Vector2(90f, 32f);
+            lockRect.sizeDelta = new Vector2(112f, 40f);
 
             SetReference(timeManager, "freezeLockIcon", lockObject);
 
             var bonusObject = new GameObject("Bonus Time Text");
             bonusObject.transform.SetParent(canvasObject.transform, false);
             var bonusText = bonusObject.AddComponent<UnityEngine.UI.Text>();
-            bonusText.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+            bonusText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
             bonusText.alignment = TextAnchor.MiddleCenter;
-            bonusText.fontSize = 44;
+            bonusText.fontSize = 54;
             bonusText.fontStyle = FontStyle.Bold;
             bonusText.color = Color.green;
             bonusText.gameObject.SetActive(false);
@@ -1802,7 +1805,7 @@ namespace RushBank.EditorTools
             bonusRect.anchorMax = new Vector2(0.5f, 1f);
             bonusRect.pivot = new Vector2(0.5f, 1f);
             bonusRect.anchoredPosition = new Vector2(0f, -104f);
-            bonusRect.sizeDelta = new Vector2(220f, 60f);
+            bonusRect.sizeDelta = new Vector2(280f, 74f);
 
             var callButtonObject = new GameObject("Call Customer Button");
             callButtonObject.transform.SetParent(canvasObject.transform, false);
@@ -1813,16 +1816,16 @@ namespace RushBank.EditorTools
             callRect.anchorMin = new Vector2(1f, 0f);
             callRect.anchorMax = new Vector2(1f, 0f);
             callRect.pivot = new Vector2(1f, 0f);
-            callRect.anchoredPosition = new Vector2(-28f, 28f);
-            callRect.sizeDelta = new Vector2(280f, 84f);
+            callRect.anchoredPosition = new Vector2(-42f, 54f);
+            callRect.sizeDelta = new Vector2(460f, 138f);
 
             var labelObject = new GameObject("Label");
             labelObject.transform.SetParent(callButtonObject.transform, false);
             var label = labelObject.AddComponent<UnityEngine.UI.Text>();
-            label.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+            label.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
             label.text = "Call Customer";
             label.alignment = TextAnchor.MiddleCenter;
-            label.fontSize = 30;
+            label.fontSize = 42;
             label.color = Color.white;
             var labelRect = labelObject.GetComponent<RectTransform>();
             labelRect.anchorMin = Vector2.zero;
@@ -1887,7 +1890,7 @@ namespace RushBank.EditorTools
             var labelObject = new GameObject("Label");
             labelObject.transform.SetParent(sliderObject.transform, false);
             var label = labelObject.AddComponent<UnityEngine.UI.Text>();
-            label.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+            label.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
             label.text = "KafeinMode";
             label.alignment = TextAnchor.MiddleCenter;
             label.fontSize = 18;
@@ -1956,7 +1959,7 @@ namespace RushBank.EditorTools
             var phoneLabelObject = new GameObject("Phone Icon");
             phoneLabelObject.transform.SetParent(buttonObject.transform, false);
             var phoneLabel = phoneLabelObject.AddComponent<UnityEngine.UI.Text>();
-            phoneLabel.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+            phoneLabel.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
             phoneLabel.text = "TEL";
             phoneLabel.alignment = TextAnchor.MiddleCenter;
             phoneLabel.fontSize = 20;
@@ -1971,7 +1974,7 @@ namespace RushBank.EditorTools
             var rewardObject = new GameObject("Phone Reward Text");
             rewardObject.transform.SetParent(canvasTransform, false);
             var reward = rewardObject.AddComponent<UnityEngine.UI.Text>();
-            reward.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+            reward.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
             reward.text = "+8s (Perfect!)";
             reward.alignment = TextAnchor.MiddleCenter;
             reward.fontSize = 26;
@@ -2019,7 +2022,7 @@ namespace RushBank.EditorTools
             var labelObject = new GameObject("Label");
             labelObject.transform.SetParent(buttonObject.transform, false);
             var label = labelObject.AddComponent<UnityEngine.UI.Text>();
-            label.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+            label.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
             label.text = "Request Cash Dispatch";
             label.alignment = TextAnchor.MiddleCenter;
             label.fontSize = 25;
@@ -2082,7 +2085,7 @@ namespace RushBank.EditorTools
             var labelObject = new GameObject("Label");
             labelObject.transform.SetParent(barObject.transform, false);
             var label = labelObject.AddComponent<UnityEngine.UI.Text>();
-            label.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+            label.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
             label.text = "Helper";
             label.alignment = TextAnchor.MiddleCenter;
             label.fontSize = 18;
@@ -2112,7 +2115,7 @@ namespace RushBank.EditorTools
             var buttonLabelObject = new GameObject("Label");
             buttonLabelObject.transform.SetParent(summonButtonObject.transform, false);
             var buttonLabel = buttonLabelObject.AddComponent<UnityEngine.UI.Text>();
-            buttonLabel.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+            buttonLabel.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
             buttonLabel.text = "Summon Helper";
             buttonLabel.alignment = TextAnchor.MiddleCenter;
             buttonLabel.fontSize = 26;

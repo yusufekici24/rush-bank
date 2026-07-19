@@ -86,7 +86,7 @@ namespace RushBank.Gameplay
 
             if (uiFont == null)
             {
-                uiFont = Resources.GetBuiltinResource<Font>("Arial.ttf");
+                uiFont = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
             }
         }
 

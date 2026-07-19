@@ -498,7 +498,7 @@ namespace RushBank.Gameplay
             var textObject = new GameObject(name);
             textObject.transform.SetParent(parent, false);
             var text = textObject.AddComponent<Text>();
-            text.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+            text.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
             text.text = value;
             text.alignment = TextAnchor.MiddleCenter;
             text.fontSize = fontSize;

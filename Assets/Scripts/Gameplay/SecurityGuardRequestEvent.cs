@@ -357,7 +357,7 @@ namespace RushBank.Gameplay
             var labelObject = new GameObject("Label");
             labelObject.transform.SetParent(buttonObject.transform, false);
             chargeButtonLabel = labelObject.AddComponent<Text>();
-            chargeButtonLabel.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+            chargeButtonLabel.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
             chargeButtonLabel.text = "CHARGE RADIO";
             chargeButtonLabel.alignment = TextAnchor.MiddleCenter;
             chargeButtonLabel.fontSize = 19;

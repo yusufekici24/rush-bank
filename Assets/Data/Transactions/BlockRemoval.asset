@@ -1,0 +1,40 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9cc7e8df2505234da5c0db0d1d94f2c, type: 3}
+  m_Name: BlockRemoval
+  m_EditorClassIdentifier: Assembly-CSharp::RushBank.Gameplay.BankTransaction
+  transactionName: "Kart \u015Eifre Blokesi Kald\u0131rma"
+  baseTimeReward: 5
+  requestIcon: {fileID: 0}
+  itemPrefabNeeded: {fileID: 7167217277095159926, guid: 2ea64ee628eb78241b939f3e6b3b0039, type: 3}
+  stationRoute: "Mini Terminal (Gi\u015Fe i\xE7i - Mini Game)"
+  difficulty: 1
+  gameplayRole: "Dokunmatik ekranda h\u0131zl\u0131 yap\u0131lacak mini etkile\u015Fim."
+  flowSummary: "M\xFC\u015Fteri bloke olmu\u015F kart\u0131n\u0131 verir; oyuncu
+    kart\u0131 mini terminale takar ve 3 haneli renk s\u0131ras\u0131n\u0131 do\u011Fru
+    girer."
+  workflowSteps:
+  - "M\xFC\u015Fteriden bloke olmu\u015F kart\u0131 al."
+  - "Kart\u0131 gi\u015Fedeki mini terminale tak."
+  - "Ekranda \xE7\u0131kan 3 haneli renk s\u0131ras\u0131n\u0131 izle."
+  - "K\u0131rm\u0131z\u0131/Mavi gibi renk butonlar\u0131na do\u011Fru s\u0131rayla
+    bas."
+  - "Kart\u0131 m\xFC\u015Fteriye geri ver ve +5 saniye kazan."
+  feedbackCue: terminal_color_sequence
+  flow: 1
+  processingSeconds: 1.2
+  customerSignatureSeconds: 0
+  managerApprovalSeconds: 0
+  expertiseEvaluationSeconds: 0
+  requiresDocumentDesk: 0
+  requiresManagerApproval: 0
+  requiresExpertiseDesk: 0

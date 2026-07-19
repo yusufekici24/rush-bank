@@ -404,7 +404,7 @@ namespace RushBank.Gameplay
             activeGoldPenaltyText = new GameObject("Counter Meltdown Gold Penalty Text");
             activeGoldPenaltyText.transform.SetParent(targetCanvas.transform, false);
             var text = activeGoldPenaltyText.AddComponent<Text>();
-            text.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+            text.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
             text.text = $"-{goldPenalty} Gold";
             text.alignment = TextAnchor.MiddleCenter;
             text.fontSize = 34;

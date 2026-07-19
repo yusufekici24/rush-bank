@@ -1,0 +1,43 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9cc7e8df2505234da5c0db0d1d94f2c, type: 3}
+  m_Name: VipSafeRental
+  m_EditorClassIdentifier: Assembly-CSharp::RushBank.Gameplay.BankTransaction
+  transactionName: "VIP Kiral\u0131k Kasa"
+  baseTimeReward: 15
+  requestIcon: {fileID: 0}
+  itemPrefabNeeded: {fileID: 2688753860184199052, guid: 00b342076b88bfa4a9637e033ec11f0e, type: 3}
+  stationRoute: "VIP M\xFC\u015Fteriye Kasa Odas\u0131na Kadar E\u015Flik Etme"
+  difficulty: 4
+  gameplayRole: "Oyuncuyu bankodan uzakla\u015Ft\u0131ran riskli ama y\xFCksek \xF6d\xFCll\xFC
+    e\u015Flik g\xF6revi."
+  flowSummary: "VIP m\xFC\u015Fteri anahtar simgesiyle gelir; oyuncu m\xFC\u015Fteriye
+    kiral\u0131k kasa odas\u0131na kadar e\u015Flik eder, kap\u0131da bekler ve m\xFC\u015Fteriyi
+    \xE7\u0131k\u0131\u015Fa u\u011Furlar."
+  workflowSteps:
+  - "VIP m\xFC\u015Fterinin yan\u0131na git."
+  - "M\xFC\u015Fteriye \u015Fubenin arkas\u0131ndaki Kiral\u0131k Kasa Odas\u0131'na
+    kadar e\u015Flik et."
+  - "Kasa kap\u0131s\u0131nda 2 saniye bekleyip kap\u0131y\u0131 a\xE7."
+  - "M\xFC\u015Fterinin i\xE7eri girip alt\u0131n\u0131n\u0131 veya m\xFCcevherini
+    almas\u0131n\u0131 bekle."
+  - "VIP m\xFC\u015Fteriyi tekrar \xE7\u0131k\u0131\u015Fa kadar u\u011Furla ve +15
+    saniye kazan."
+  feedbackCue: safe_door_open
+  flow: 6
+  processingSeconds: 0
+  customerSignatureSeconds: 0
+  managerApprovalSeconds: 0
+  expertiseEvaluationSeconds: 0
+  requiresDocumentDesk: 0
+  requiresManagerApproval: 0
+  requiresExpertiseDesk: 0

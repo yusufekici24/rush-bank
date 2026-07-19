@@ -66,10 +66,14 @@ namespace RushBank.Gameplay
             var mainRenderer = GetComponent<Renderer>();
             if (mainRenderer != null)
             {
-                var material = mainRenderer.material;
+                var sourceMaterial = mainRenderer.sharedMaterial != null
+                    ? mainRenderer.sharedMaterial
+                    : new Material(Shader.Find("Standard"));
+                var material = new Material(sourceMaterial);
                 material.color = shinySuitColor;
                 material.EnableKeyword("_EMISSION");
                 material.SetColor("_EmissionColor", shinySuitColor * 0.18f);
+                mainRenderer.sharedMaterial = material;
             }
 
             if (createFallbackRichVisuals && transform.Find("VIP Golden Sunglasses") == null)

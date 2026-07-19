@@ -44,7 +44,7 @@ namespace RushBank.Art
             var visual = visualObject.transform;
 
             var outfit = ReadOutfitColor(characterRoot);
-            var seed = Mathf.Abs(characterRoot.GetInstanceID());
+            var seed = BuildStableSeed(characterRoot, style);
 
             if (style == ChubbyCharacterStyle.Cat)
             {
@@ -107,6 +107,18 @@ namespace RushBank.Art
             }
 
             return RushBankArtLibrary.Cream;
+        }
+
+        private static int BuildStableSeed(GameObject characterRoot, ChubbyCharacterStyle style)
+        {
+            unchecked
+            {
+                var hash = 17;
+                hash = (hash * 31) + characterRoot.name.GetHashCode();
+                hash = (hash * 31) + characterRoot.transform.GetSiblingIndex();
+                hash = (hash * 31) + (int)style;
+                return hash == int.MinValue ? 0 : Mathf.Abs(hash);
+            }
         }
 
         private static void BuildFace(Transform visual, float eyeDepth, bool withBlush)
