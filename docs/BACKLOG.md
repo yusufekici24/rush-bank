@@ -84,7 +84,8 @@ Bu dosya, Unity prototipi için bilinen isterleri, eksikleri ve önerilen geliş
 - SecurityGuardRequestEvent eklendi; Recai Abi 70-90 saniyede bir giseye telsiz/techizat istegiyle gelir, tek tiklik Charge Radio butonu acar, cozulurse +50 Gold, +10 mudur memnuniyeti, 25 saniyelik dolandirici evrak highlight'i ve 0.7x sabir rahatlatmasi verir; bekletilirse -15 mudur memnuniyeti uygular.
 - WetFloorAccidentSystem eklendi; Cayci Abla temizlik yaparken lobide islak zemin alanı olusturur, yeni giren musteriler %15 sansla kayip duser, tek tiklik Send Guard butonuyla Recai Abi kurtarmasi yapilir, +100 Gold, +15 mudur memnuniyeti ve 20 saniyelik 0.6x Compassionate Branch sabir boost'u verilir.
 - HeistRaidSystem eklendi; Super Cash Bag ile şubeye girince %10-15 nadir soygun roll'u, yamuk çorap maskeli 2-3 hırsız, konuşma/el sallama cue'ları, kırmızı/mavi göz cue, oyuncu diz titreme korku efekti, %50 yavaşlama, yakalanınca 2 saniye freeze cezası, alarm butonu, polis gelince çuval fırlatma ve tutuklama akışı hazır.
-- Kamera sistemi yok.
+- PortraitCameraFitter eklendi; Game sahnesindeki izometrik kamera dikey (9:16 ve daha uzun) ekranlarda şube genişliğini otomatik kadrajlar, geniş editör görünümünde eski orthographic size'a döner.
+- PlayAreaLimiter ve görünmez çevre bariyerleri eklendi; şube zemininin açık ön kenarı dahil dört kenar collider ile kapatıldı, karakter duvar delinse bile Rigidbody clamp ile şube içinde kalır.
 - Etkileşim sistemi sahneye bağlanmadı.
 - Senaryo verileri yok.
 - Müşteri tipi verileri yok.

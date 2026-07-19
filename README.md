@@ -14,6 +14,8 @@ Proje PR akisi ile gelistirilir. `main` branch'ine dogrudan push yapilmaz. Degis
 - `Game` sahnesi Play Mode'da aciliyor
 - UI gorunuyor, karakter hareket ediyor, Console'da kirmizi hata kalmadi
 - Dikey sahne kompozisyonu baslatildi: alt bolgede oyuncu/gise, orta bolgede bekleme alani, yanlarda uzman masalari, ustte giris ve guvenlik
+- Dikey kadraj otomatiklesti: `PortraitCameraFitter` kamerayi 9:16 ve daha uzun ekranlarda sube genisligini tam gosterecek sekilde ayarlar, genis editor gorunumunde eski kadraja doner
+- Oyun alani sinirlandi: sube cevresine gorunmez bariyer collider'lari eklendi, `PlayAreaLimiter` karakteri her durumda sube ici alanda tutar
 
 ## Hizli Baslangic
 
