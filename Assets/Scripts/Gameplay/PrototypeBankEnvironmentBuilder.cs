@@ -9,10 +9,10 @@ namespace RushBank.Gameplay
         private const string RootName = "Prototype Environment";
 
         [SerializeField] private bool buildOnStart = true;
-        [SerializeField] private Color floorColor = new Color(0.78f, 0.75f, 0.68f);
-        [SerializeField] private Color wallColor = new Color(0.92f, 0.9f, 0.84f);
-        [SerializeField] private Color counterColor = new Color(0.18f, 0.23f, 0.24f);
-        [SerializeField] private Color accentColor = new Color(0.09f, 0.63f, 0.35f);
+        [SerializeField] private Color floorColor = new Color(0.66f, 0.62f, 0.54f);
+        [SerializeField] private Color wallColor = new Color(0.78f, 0.74f, 0.65f);
+        [SerializeField] private Color counterColor = new Color(0.20f, 0.22f, 0.21f);
+        [SerializeField] private Color accentColor = new Color(0.18f, 0.48f, 0.34f);
 
         private void Start()
         {
@@ -53,19 +53,25 @@ namespace RushBank.Gameplay
 
         private void BuildShell(Transform root)
         {
-            CreateSolidCube(root, "Floor", new Vector3(0f, -0.05f, 0f), new Vector3(12f, 0.1f, 10f), RushBankArtLibrary.Floor());
+            CreateSolidCube(root, "Floor", new Vector3(0f, -0.05f, -4f), new Vector3(12f, 0.1f, 18f), RushBankArtLibrary.Floor());
             CreateSolidCube(root, "Back Wall", new Vector3(0f, 1.5f, 5f), new Vector3(12f, 3f, 0.2f), RushBankArtLibrary.Wall());
-            CreateSolidCube(root, "Left Wall", new Vector3(-6f, 1.5f, 0f), new Vector3(0.2f, 3f, 10f), RushBankArtLibrary.Wall());
-            CreateSolidCube(root, "Right Wall", new Vector3(6f, 1.5f, 0f), new Vector3(0.2f, 3f, 10f), RushBankArtLibrary.Wall());
+            CreateSolidCube(root, "Left Wall", new Vector3(-6f, 1.5f, -4f), new Vector3(0.2f, 3f, 18f), RushBankArtLibrary.Wall());
+            CreateSolidCube(root, "Right Wall", new Vector3(6f, 1.5f, -4f), new Vector3(0.2f, 3f, 18f), RushBankArtLibrary.Wall());
 
             var baseboard = RushBankArtLibrary.Flat(RushBankArtLibrary.Darken(floorColor, 0.35f));
             RushBankArtLibrary.Shape(PrimitiveType.Cube, root, "Baseboard Back", new Vector3(0f, 0.09f, 4.87f), new Vector3(11.9f, 0.18f, 0.06f), baseboard);
-            RushBankArtLibrary.Shape(PrimitiveType.Cube, root, "Baseboard Left", new Vector3(-5.87f, 0.09f, 0f), new Vector3(0.06f, 0.18f, 9.9f), baseboard);
-            RushBankArtLibrary.Shape(PrimitiveType.Cube, root, "Baseboard Right", new Vector3(5.87f, 0.09f, 0f), new Vector3(0.06f, 0.18f, 9.9f), baseboard);
+            RushBankArtLibrary.Shape(PrimitiveType.Cube, root, "Baseboard Left", new Vector3(-5.87f, 0.09f, -4f), new Vector3(0.06f, 0.18f, 17.85f), baseboard);
+            RushBankArtLibrary.Shape(PrimitiveType.Cube, root, "Baseboard Right", new Vector3(5.87f, 0.09f, -4f), new Vector3(0.06f, 0.18f, 17.85f), baseboard);
+            RushBankArtLibrary.Shape(PrimitiveType.Cube, root, "Front Floor Lip", new Vector3(0f, 0.025f, -12.96f), new Vector3(12f, 0.06f, 0.18f), baseboard);
         }
 
         private void BuildCounterArea(Transform root)
         {
+            var counterRoot = new GameObject("Counter Area").transform;
+            counterRoot.SetParent(root, false);
+            counterRoot.localPosition = new Vector3(0f, 0f, -7.1f);
+            root = counterRoot;
+
             CreateSolidCube(root, "Teller Counter", new Vector3(0f, 0.55f, -1.35f), new Vector3(4.8f, 1.1f, 0.8f), RushBankArtLibrary.Flat(counterColor));
 
             var counterTop = RushBankArtLibrary.Flat(RushBankArtLibrary.WoodDark);
@@ -209,12 +215,56 @@ namespace RushBank.Gameplay
         private void BuildDecor(Transform root)
         {
             CreatePlant(root, new Vector3(5.5f, 0f, 4.5f));
-            CreatePlant(root, new Vector3(5.5f, 0f, -4.5f));
-            CreatePlant(root, new Vector3(-5.5f, 0f, -4.5f));
+            CreatePlant(root, new Vector3(5.5f, 0f, -7.4f));
+            CreatePlant(root, new Vector3(-5.5f, 0f, -7.4f));
 
-            CreateBench(root, new Vector3(1.3f, 0f, 4.5f));
-            CreateBench(root, new Vector3(3.3f, 0f, 4.5f));
+            CreateWaitingLounge(root);
+            CreateSideServiceDesks(root);
             CreateAtm(root);
+        }
+
+        private static void CreateWaitingLounge(Transform root)
+        {
+            CreateBench(root, new Vector3(-0.7f, 0f, 0.65f), Quaternion.Euler(0f, 90f, 0f));
+            CreateBench(root, new Vector3(0.7f, 0f, 0.65f), Quaternion.Euler(0f, 90f, 0f));
+            CreateBench(root, new Vector3(-0.7f, 0f, 2.45f), Quaternion.Euler(0f, 90f, 0f));
+            CreateBench(root, new Vector3(0.7f, 0f, 2.45f), Quaternion.Euler(0f, 90f, 0f));
+
+            var table = RushBankArtLibrary.Flat(RushBankArtLibrary.WoodWarm);
+            var leg = RushBankArtLibrary.Flat(RushBankArtLibrary.SlateDark);
+            RushBankArtLibrary.Shape(PrimitiveType.Cube, root, "Waiting Coffee Table", new Vector3(0f, 0.34f, 1.55f), new Vector3(0.65f, 0.08f, 0.95f), table);
+            RushBankArtLibrary.Shape(PrimitiveType.Cylinder, root, "Waiting Table Leg A", new Vector3(-0.24f, 0.17f, 1.18f), new Vector3(0.035f, 0.17f, 0.035f), leg);
+            RushBankArtLibrary.Shape(PrimitiveType.Cylinder, root, "Waiting Table Leg B", new Vector3(0.24f, 0.17f, 1.18f), new Vector3(0.035f, 0.17f, 0.035f), leg);
+            RushBankArtLibrary.Shape(PrimitiveType.Cylinder, root, "Waiting Table Leg C", new Vector3(-0.24f, 0.17f, 1.92f), new Vector3(0.035f, 0.17f, 0.035f), leg);
+            RushBankArtLibrary.Shape(PrimitiveType.Cylinder, root, "Waiting Table Leg D", new Vector3(0.24f, 0.17f, 1.92f), new Vector3(0.035f, 0.17f, 0.035f), leg);
+        }
+
+        private void CreateSideServiceDesks(Transform root)
+        {
+            CreateSideDesk(root, "Left Service Desk A", new Vector3(-5.05f, 0f, 2.35f), Quaternion.Euler(0f, 90f, 0f), "ILISKI");
+            CreateSideDesk(root, "Left Service Desk B", new Vector3(-5.05f, 0f, -1.35f), Quaternion.Euler(0f, 90f, 0f), "KREDI");
+            CreateSideDesk(root, "Right Service Desk A", new Vector3(5.05f, 0f, 2.35f), Quaternion.Euler(0f, -90f, 0f), "SIGORTA");
+            CreateSideDesk(root, "Right Service Desk B", new Vector3(5.05f, 0f, -1.35f), Quaternion.Euler(0f, -90f, 0f), "MUDUR");
+        }
+
+        private void CreateSideDesk(Transform root, string name, Vector3 position, Quaternion rotation, string label)
+        {
+            var holder = new GameObject(name);
+            holder.transform.SetParent(root, false);
+            holder.transform.localPosition = position;
+            holder.transform.localRotation = rotation;
+
+            var wood = RushBankArtLibrary.Flat(RushBankArtLibrary.WoodDark);
+            var accent = RushBankArtLibrary.Flat(RushBankArtLibrary.BankGreenDark);
+            var screen = RushBankArtLibrary.Emissive(new Color(0.17f, 0.36f, 0.38f), new Color(0.28f, 0.75f, 0.78f), 0.45f);
+            var chair = RushBankArtLibrary.Flat(RushBankArtLibrary.Navy);
+
+            RushBankArtLibrary.Shape(PrimitiveType.Cube, holder.transform, "Desk", new Vector3(0f, 0.45f, 0f), new Vector3(1.45f, 0.9f, 0.78f), wood);
+            RushBankArtLibrary.Shape(PrimitiveType.Cube, holder.transform, "Desk Stripe", new Vector3(0f, 0.75f, -0.41f), new Vector3(1.35f, 0.08f, 0.04f), accent);
+            RushBankArtLibrary.Shape(PrimitiveType.Cube, holder.transform, "Monitor", new Vector3(0f, 1.08f, -0.1f), new Vector3(0.46f, 0.28f, 0.04f), screen);
+            RushBankArtLibrary.Shape(PrimitiveType.Cube, holder.transform, "Chair Back", new Vector3(0f, 0.78f, 0.82f), new Vector3(0.7f, 0.7f, 0.12f), chair);
+            RushBankArtLibrary.Shape(PrimitiveType.Cube, holder.transform, "Chair Seat", new Vector3(0f, 0.38f, 0.58f), new Vector3(0.7f, 0.12f, 0.55f), chair);
+            RushBankArtLibrary.Label(holder.transform, label, new Vector3(0f, 1.05f, -0.44f), 0.08f, RushBankArtLibrary.Cream, new Vector3(65f, 0f, 0f));
         }
 
         private static void CreatePlant(Transform root, Vector3 position)
@@ -239,9 +289,15 @@ namespace RushBank.Gameplay
 
         private static void CreateBench(Transform root, Vector3 position)
         {
+            CreateBench(root, position, Quaternion.identity);
+        }
+
+        private static void CreateBench(Transform root, Vector3 position, Quaternion rotation)
+        {
             var holder = new GameObject("Waiting Bench");
             holder.transform.SetParent(root, false);
             holder.transform.localPosition = position;
+            holder.transform.localRotation = rotation;
 
             var seat = RushBankArtLibrary.Flat(RushBankArtLibrary.WoodWarm);
             var leg = RushBankArtLibrary.Flat(RushBankArtLibrary.SlateDark);
@@ -305,9 +361,9 @@ namespace RushBank.Gameplay
         private void TuneLightingAndCamera()
         {
             RenderSettings.ambientMode = AmbientMode.Trilight;
-            RenderSettings.ambientSkyColor = new Color(1f, 0.94f, 0.85f);
-            RenderSettings.ambientEquatorColor = new Color(0.72f, 0.68f, 0.62f);
-            RenderSettings.ambientGroundColor = new Color(0.38f, 0.35f, 0.32f);
+            RenderSettings.ambientSkyColor = new Color(0.76f, 0.72f, 0.64f);
+            RenderSettings.ambientEquatorColor = new Color(0.55f, 0.52f, 0.46f);
+            RenderSettings.ambientGroundColor = new Color(0.28f, 0.27f, 0.25f);
             RenderSettings.fog = false;
 
             var lights = FindObjectsByType<Light>(FindObjectsSortMode.None);
@@ -318,8 +374,8 @@ namespace RushBank.Gameplay
                     continue;
                 }
 
-                lights[i].color = new Color(1f, 0.95f, 0.86f);
-                lights[i].intensity = 1f;
+                lights[i].color = new Color(0.90f, 0.82f, 0.68f);
+                lights[i].intensity = 0.72f;
                 lights[i].transform.rotation = Quaternion.Euler(52f, -28f, 0f);
                 lights[i].shadows = LightShadows.Soft;
                 lights[i].shadowStrength = 0.55f;
@@ -328,7 +384,7 @@ namespace RushBank.Gameplay
             var camera = Camera.main;
             if (camera != null && camera.clearFlags == CameraClearFlags.SolidColor)
             {
-                camera.backgroundColor = new Color(0.1f, 0.15f, 0.19f);
+                camera.backgroundColor = new Color(0.12f, 0.14f, 0.14f);
             }
         }
 

@@ -551,7 +551,7 @@ namespace RushBank.Gameplay
             var labelObject = new GameObject("Phone Icon Label");
             labelObject.transform.SetParent(buttonObject.transform, false);
             phoneIconLabel = labelObject.AddComponent<Text>();
-            phoneIconLabel.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+            phoneIconLabel.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
             phoneIconLabel.text = "TEL?";
             phoneIconLabel.alignment = TextAnchor.MiddleCenter;
             phoneIconLabel.fontSize = 20;
@@ -566,7 +566,7 @@ namespace RushBank.Gameplay
             var rewardObject = new GameObject("Two Tier Phone Reward Text");
             rewardObject.transform.SetParent(targetCanvas.transform, false);
             rewardText = rewardObject.AddComponent<Text>();
-            rewardText.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+            rewardText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
             rewardText.alignment = TextAnchor.MiddleCenter;
             rewardText.fontSize = 26;
             rewardText.fontStyle = FontStyle.Bold;
@@ -592,7 +592,7 @@ namespace RushBank.Gameplay
             var hqTextObject = new GameObject("HQ Failed Text");
             hqTextObject.transform.SetParent(hqFailedOverlay.transform, false);
             hqFailedText = hqTextObject.AddComponent<Text>();
-            hqFailedText.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+            hqFailedText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
             hqFailedText.text = "HQ AUDIT FAILED";
             hqFailedText.alignment = TextAnchor.MiddleCenter;
             hqFailedText.fontSize = 44;

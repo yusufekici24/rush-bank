@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9cc7e8df2505234da5c0db0d1d94f2c, type: 3}
+  m_Name: CashWithdrawDeposit
+  m_EditorClassIdentifier: Assembly-CSharp::RushBank.Gameplay.BankTransaction
+  transactionName: "Para \xC7ekme/Yat\u0131rma"
+  baseTimeReward: 7
+  requestIcon: {fileID: 0}
+  itemPrefabNeeded: {fileID: 3634422177625268500, guid: df97b8829caba2a4d9a647a74abec0fd, type: 3}
+  stationRoute: "Gi\u015Fe <-> Ana Kasa (Vault)"
+  difficulty: 2
+  gameplayRole: 
+  flowSummary: 
+  workflowSteps: []
+  feedbackCue: 
+  flow: 2
+  processingSeconds: 0
+  customerSignatureSeconds: 0
+  managerApprovalSeconds: 0
+  expertiseEvaluationSeconds: 0
+  requiresDocumentDesk: 0
+  requiresManagerApproval: 0
+  requiresExpertiseDesk: 0

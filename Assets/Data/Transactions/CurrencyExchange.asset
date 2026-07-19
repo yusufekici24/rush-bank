@@ -1,0 +1,41 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9cc7e8df2505234da5c0db0d1d94f2c, type: 3}
+  m_Name: CurrencyExchange
+  m_EditorClassIdentifier: Assembly-CSharp::RushBank.Gameplay.BankTransaction
+  transactionName: "D\xF6viz Bozdurma"
+  baseTimeReward: 7
+  requestIcon: {fileID: 0}
+  itemPrefabNeeded: {fileID: 3798093882916364656, guid: 59c76db7ea1c07c49917570c726e3cba, type: 3}
+  stationRoute: "Gi\u015Fe <-> Kur \xC7evirici Masas\u0131"
+  difficulty: 2
+  gameplayRole: "H\u0131zl\u0131 karar verme ve renk/sembol e\u015Fle\u015Ftirme
+    mekani\u011Fi."
+  flowSummary: "M\xFC\u015Fteri dolar veya euro simgeli \xE7uvalla gelir; oyuncu
+    \xE7uval\u0131 Kur \xC7evirici masas\u0131na koyar ve yerel para makbuzunu teslim
+    eder."
+  workflowSteps:
+  - "M\xFC\u015Fteriden yabanc\u0131 para \xE7uval\u0131n\u0131 al."
+  - "\xC7uval\u0131 gi\u015Fe arkas\u0131ndaki Kur \xC7evirici masas\u0131na koy."
+  - "Cihaz\u0131n yakt\u0131\u011F\u0131 ye\u015Fil veya mavi \u0131\u015F\u0131\u011F\u0131/simgeyi
+    takip et."
+  - "D\xF6nen yerel para makbuzunu al."
+  - "Makbuzu m\xFC\u015Fteriye teslim et ve +7 saniye kazan."
+  feedbackCue: currency_converter_light
+  flow: 3
+  processingSeconds: 0
+  customerSignatureSeconds: 0
+  managerApprovalSeconds: 0
+  expertiseEvaluationSeconds: 1.5
+  requiresDocumentDesk: 0
+  requiresManagerApproval: 0
+  requiresExpertiseDesk: 0

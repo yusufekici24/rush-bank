@@ -941,7 +941,7 @@ namespace RushBank.Gameplay
             var textObject = new GameObject("Notification Text");
             textObject.transform.SetParent(banner.transform, false);
             notificationText = textObject.AddComponent<Text>();
-            notificationText.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+            notificationText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
             notificationText.alignment = TextAnchor.MiddleCenter;
             notificationText.fontSize = 18;
             notificationText.fontStyle = FontStyle.Bold;

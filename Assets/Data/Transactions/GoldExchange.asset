@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9cc7e8df2505234da5c0db0d1d94f2c, type: 3}
+  m_Name: GoldExchange
+  m_EditorClassIdentifier: Assembly-CSharp::RushBank.Gameplay.BankTransaction
+  transactionName: "Alt\u0131n Bozdurma"
+  baseTimeReward: 10
+  requestIcon: {fileID: 0}
+  itemPrefabNeeded: {fileID: 1677478226107321964, guid: d7abc84f1d353a240a19046c61bf77cc, type: 3}
+  stationRoute: "Gi\u015Fe -> Ekspertiz Masas\u0131 -> Gi\u015Fe"
+  difficulty: 3
+  gameplayRole: 
+  flowSummary: 
+  workflowSteps: []
+  feedbackCue: 
+  flow: 4
+  processingSeconds: 0
+  customerSignatureSeconds: 0
+  managerApprovalSeconds: 0
+  expertiseEvaluationSeconds: 2
+  requiresDocumentDesk: 0
+  requiresManagerApproval: 0
+  requiresExpertiseDesk: 1

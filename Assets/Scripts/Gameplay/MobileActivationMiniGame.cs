@@ -1,4 +1,5 @@
 using System.Collections;
+using RushBank.Core;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
@@ -378,7 +379,7 @@ namespace RushBank.Gameplay
 
             if (uiFont == null)
             {
-                uiFont = Resources.GetBuiltinResource<Font>("Arial.ttf");
+                uiFont = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
             }
 
             CreateFallbackUi();
@@ -485,7 +486,7 @@ namespace RushBank.Gameplay
             var textObject = new GameObject(name);
             textObject.transform.SetParent(parent, false);
             var text = textObject.AddComponent<Text>();
-            text.font = uiFont != null ? uiFont : Resources.GetBuiltinResource<Font>("Arial.ttf");
+            text.font = uiFont != null ? uiFont : Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
             text.text = value;
             text.alignment = TextAnchor.MiddleCenter;
             text.fontSize = fontSize;

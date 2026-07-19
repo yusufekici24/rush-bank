@@ -363,7 +363,7 @@ namespace RushBank.Gameplay
             var labelObject = new GameObject("Label");
             labelObject.transform.SetParent(buttonObject.transform, false);
             refillButtonLabel = labelObject.AddComponent<Text>();
-            refillButtonLabel.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+            refillButtonLabel.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
             refillButtonLabel.text = "REFILL BREW";
             refillButtonLabel.alignment = TextAnchor.MiddleCenter;
             refillButtonLabel.fontSize = 20;

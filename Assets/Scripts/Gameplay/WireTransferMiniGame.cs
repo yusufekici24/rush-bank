@@ -1,4 +1,5 @@
 using System.Collections;
+using RushBank.Core;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
@@ -341,7 +342,7 @@ namespace RushBank.Gameplay
 
             if (handwrittenFont == null)
             {
-                handwrittenFont = Resources.GetBuiltinResource<Font>("Arial.ttf");
+                handwrittenFont = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
             }
 
             CreateFallbackUi();
@@ -437,7 +438,7 @@ namespace RushBank.Gameplay
             var textObject = new GameObject(name);
             textObject.transform.SetParent(parent, false);
             var text = textObject.AddComponent<Text>();
-            text.font = handwrittenFont != null ? handwrittenFont : Resources.GetBuiltinResource<Font>("Arial.ttf");
+            text.font = handwrittenFont != null ? handwrittenFont : Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
             text.text = value;
             text.alignment = TextAnchor.MiddleCenter;
             text.fontSize = fontSize;
@@ -497,7 +498,7 @@ namespace RushBank.Gameplay
             floatingPerfectText = new GameObject("Perfect Transfer Floating Text");
             floatingPerfectText.transform.SetParent(targetCanvas.transform, false);
             var text = floatingPerfectText.AddComponent<Text>();
-            text.font = handwrittenFont != null ? handwrittenFont : Resources.GetBuiltinResource<Font>("Arial.ttf");
+            text.font = handwrittenFont != null ? handwrittenFont : Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
             text.text = "Perfect Transfer! +20% Gold!";
             text.alignment = TextAnchor.MiddleCenter;
             text.fontSize = 30;

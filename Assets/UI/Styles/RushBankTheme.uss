@@ -2,9 +2,9 @@
     flex-grow: 1;
     min-width: 100%;
     min-height: 100%;
-    background-color: #111315;
+    background-color: #171917;
     color: #f7f3ea;
-    padding: 28px;
+    padding: 34px;
 }
 
 .menu-screen {
@@ -52,20 +52,21 @@
 .secondary-button,
 .ghost-button,
 .text-button {
-    height: 46px;
+    height: 68px;
     border-radius: 8px;
     border-width: 0;
-    margin-bottom: 10px;
+    margin-bottom: 14px;
     unity-font-style: bold;
+    font-size: 22px;
 }
 
 .primary-button {
-    background-color: #18a058;
+    background-color: #2f8c5a;
     color: #ffffff;
 }
 
 .secondary-button {
-    background-color: #f2c94c;
+    background-color: #d8b45a;
     color: #24211a;
 }
 
@@ -153,56 +154,65 @@
 }
 
 .hud-pill {
-    min-width: 116px;
+    min-width: 176px;
     background-color: #f7f3ea;
     border-radius: 8px;
-    padding: 10px 14px;
-    margin-right: 10px;
+    padding: 14px 18px;
+    margin-right: 12px;
 }
 
 .combo-pill {
-    background-color: #f2c94c;
+    background-color: #d8b45a;
 }
 
 .hud-label {
     color: #6b6258;
-    font-size: 11px;
+    font-size: 15px;
 }
 
 .hud-value {
     color: #1d1f22;
-    font-size: 22px;
+    font-size: 34px;
     unity-font-style: bold;
 }
 
 .service-panel {
     align-self: center;
-    width: 520px;
+    width: 760px;
+    padding: 24px;
+}
+
+.service-title {
+    font-size: 30px;
 }
 
 .service-request {
-    margin-top: 8px;
-    font-size: 18px;
-    color: #18a058;
+    margin-top: 10px;
+    font-size: 26px;
+    color: #2f8c5a;
     unity-font-style: bold;
 }
 
+.service-copy {
+    font-size: 18px;
+}
+
 .timer-track {
-    margin-top: 18px;
-    height: 12px;
+    margin-top: 22px;
+    height: 18px;
     background-color: #ddd4c5;
     border-radius: 8px;
 }
 
 .timer-fill {
-    height: 12px;
+    height: 18px;
     width: 0%;
-    background-color: #18a058;
+    background-color: #2f8c5a;
     border-radius: 8px;
 }
 
 .service-actions {
-    margin-top: 18px;
+    margin-top: 24px;
 }
 
 .service-actions .primary-button,

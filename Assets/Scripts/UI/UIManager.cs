@@ -212,7 +212,7 @@ namespace RushBank.UI
             var textObject = new GameObject("Icon Label");
             textObject.transform.SetParent(canvasObject.transform, false);
             var text = textObject.AddComponent<Text>();
-            text.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+            text.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
             text.alignment = TextAnchor.MiddleCenter;
             text.fontSize = 42;
             text.fontStyle = FontStyle.Bold;

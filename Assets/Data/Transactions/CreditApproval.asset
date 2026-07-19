@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9cc7e8df2505234da5c0db0d1d94f2c, type: 3}
+  m_Name: CreditApproval
+  m_EditorClassIdentifier: Assembly-CSharp::RushBank.Gameplay.BankTransaction
+  transactionName: "Kredi Onay\u0131"
+  baseTimeReward: 12
+  requestIcon: {fileID: 0}
+  itemPrefabNeeded: {fileID: 6865589335387124139, guid: fffda300b7e33f3438aa75e42dfd703c, type: 3}
+  stationRoute: "Gi\u015Fe -> \u0130mza -> M\xFCd\xFCr Odas\u0131 -> Gi\u015Fe"
+  difficulty: 3
+  gameplayRole: 
+  flowSummary: 
+  workflowSteps: []
+  feedbackCue: 
+  flow: 5
+  processingSeconds: 0
+  customerSignatureSeconds: 1.5
+  managerApprovalSeconds: 2
+  expertiseEvaluationSeconds: 0
+  requiresDocumentDesk: 1
+  requiresManagerApproval: 1
+  requiresExpertiseDesk: 0

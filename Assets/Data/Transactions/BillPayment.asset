@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9cc7e8df2505234da5c0db0d1d94f2c, type: 3}
+  m_Name: BillPayment
+  m_EditorClassIdentifier: Assembly-CSharp::RushBank.Gameplay.BankTransaction
+  transactionName: "Fatura \xD6deme"
+  baseTimeReward: 4
+  requestIcon: {fileID: 0}
+  itemPrefabNeeded: {fileID: 6848955206221615465, guid: 54e9faf174e4cb34293d97afb8ea9d5b, type: 3}
+  stationRoute: "Barkod Okuyucu (Gi\u015Fe i\xE7i)"
+  difficulty: 0
+  gameplayRole: "Oyuncuya nefes ald\u0131ran h\u0131zl\u0131 gi\u015Fe i\xE7i quick
+    win."
+  flowSummary: "M\xFC\u015Fteri elektrik veya su faturas\u0131yla gelir; oyuncu faturay\u0131
+    barkod okuyucuya okutur, nakdi al\u0131r ve \xE7ekmeceye b\u0131rak\u0131r."
+  workflowSteps:
+  - "M\xFC\u015Fteriden elektrik veya su faturas\u0131n\u0131 al."
+  - "Faturay\u0131 bankodaki Barkod Okuyucuya tut."
+  - "Bip sesinden sonra m\xFC\u015Fteriden nakit paray\u0131 al."
+  - "Nakit paray\u0131 gi\u015Fe alt\u0131ndaki \xE7ekmeceye b\u0131rak."
+  - "\u0130\u015Flemi tamamla ve +4 saniye kazan."
+  feedbackCue: barcode_beep
+  flow: 0
+  processingSeconds: 0.8
+  customerSignatureSeconds: 0
+  managerApprovalSeconds: 0
+  expertiseEvaluationSeconds: 0
+  requiresDocumentDesk: 0
+  requiresManagerApproval: 0
+  requiresExpertiseDesk: 0

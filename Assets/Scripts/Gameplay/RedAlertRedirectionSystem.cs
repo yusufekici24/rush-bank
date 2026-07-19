@@ -435,7 +435,7 @@ namespace RushBank.Gameplay
             floatingRewardText = new GameObject("Red Alert Reward Text");
             floatingRewardText.transform.SetParent(targetCanvas.transform, false);
             var text = floatingRewardText.AddComponent<Text>();
-            text.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+            text.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
             text.text = value;
             text.alignment = TextAnchor.MiddleCenter;
             text.fontSize = 36;

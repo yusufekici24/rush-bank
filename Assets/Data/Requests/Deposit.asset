@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e2932ab598fc1934388ff652b4c7a609, type: 3}
+  m_Name: Deposit
+  m_EditorClassIdentifier: Assembly-CSharp::RushBank.Gameplay.CustomerRequestDefinition
+  requestId: Deposit
+  displayName: "Para Yat\u0131rma"
+  customerLine: "Hesab\u0131ma para yat\u0131rmak istiyorum."
+  requestType: 0
+  targetProcessingSeconds: 18
+  baseScore: 100
+  scorePerRemainingSecond: 6
+  difficulty: 1

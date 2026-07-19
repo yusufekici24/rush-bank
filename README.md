@@ -1,342 +1,238 @@
 # RushBank
 
-RushBank, Unity 6 ile gelistirilen mobil odakli 3D banka subesi simulasyon oyunudur. Oyuncu banka gorevlisi olarak musteri sirasini, sureyi, kasa akisini, uzman masalarini, gunluk hedefleri ve sube icindeki beklenmedik krizleri ayni anda yonetir.
+RushBank, Unity 6 ile gelistirilen dikey ekranli mobil 3D banka subesi simulasyon oyunudur. Oyuncu banka gorevlisi olarak musteri sirasini, sureyi, kasa akisini, uzman masalarini, gunluk hedefleri ve sube icindeki beklenmedik krizleri ayni anda yonetir.
 
 Proje PR akisi ile gelistirilir. `main` branch'ine dogrudan push yapilmaz. Degisiklikler feature branch uzerinde hazirlanir, GitHub'a push edilir ve Yusuf'un onayindan sonra merge edilir.
 
 ## Mevcut Durum
 
-- Unity surumu: `6000.0.23f1`
-- Aktif calisma branch'i: `feature/dynamic-weather-system`
-- Temel Unity klasorleri hazir: `Assets`, `Packages`, `ProjectSettings`
-- Prototype setup araci hazir: `RushBank > Setup Prototype Scenes`
-- Core gameplay, kriz, meta-game, uzman masa ve gunluk gorev sistemleri script seviyesinde hazir
-- Prosedurel gorsel katman hazir: `Assets/Scripts/Art` (malzeme/doku kutuphanesi, tontis karakter giydirme, istasyon dekorlari)
-- Bu ortamda Unity Editor acilamadigi icin compile/play mode dogrulamasi Unity Hub uzerinden yapilmalidir
-
-## Gorsel Katman
-
-Oyunun grafikleri prosedurel olarak calisma aninda kurulur; harici model/texture asset'i gerekmez.
-
-- `RushBankArtLibrary`: paylasilan renk paleti, malzeme onbellegi ve prosedurel dokular (damali zemin, lambri duvar, hali). Standard shader bulunamazsa URP Lit'e duser.
-- `ChubbyCharacterDresser` + `ChubbyVisualSkinner`: sahnedeki kapsul karakterleri isim/stil kurallarina gore otomatik giydirir (goz, yanak, kol, ayak + role gore sapka, onluk, maske, kravat vb.). Musteriler icin sac varyasyonlari instance id uzerinden deterministiktir. Sabir/renk feedback'i bozulmasin diye orijinal kapsul renderer'ina dokunulmaz, gorsel parcalari cocuk obje olarak eklenir.
-- `PrototypeBankEnvironmentBuilder`: banka salonunu bastan kurar (giseler, cam bolmeler, kuyruk bariyerleri, bekleme banklari, ATM, bitkiler, tabela, saat, posterler, tavan lambalari) ve isik/ambiyans ayarini yapar. Var olan `Prototype Environment` kokunu silip yeniden kurdugu icin kayitli Game sahnesi Play'e basildiginda otomatik yeni gorunume gecer.
-- Istasyon kupleri (Dokuman/Mudur/Arsiv/Ekspertiz/Yazici/Kasa/Cekmece/Cay masasi) tag uzerinden bulunur ve ustlerine rol dekorlari eklenir; collider ve renderer feedback'leri korunur.
-
-## Oyun Ozeti
-
-Oyuncu, tontis ve kaotik bir banka subesinde musteri taleplerini tamamlayarak sure, skor, combo ve altin kazanir. Hizli islemler oyuncuya nefes aldirir; uzun islemler, krizler, destek sistemleri ve gunluk gorevler mikro-yonetim kararlarini derinlestirir.
-
-Ana hedefler:
-
-- Mobilde okunabilir, hizli ve sevimli 3D sube deneyimi
-- Kisa sureli quick-win islemler ile rahatlama ani yaratmak
-- Uzun ve riskli cok istasyonlu islemler ile karar baskisi kurmak
-- Sabir, sure, kasa, altin, musteri sirasini ve uzman masalarini ayni anda yonetmek
-- Seviye oncesi booster, sube secimi, gunluk gorev ve achievement sistemleri ile tekrar oynanabilirligi artirmak
-
-## Ana Oyun Dongusu
-
-1. Musteri subeye girer ve siraya katilir.
-2. Oyuncu siradaki musteriyi gise alanina cagirir.
-3. Musterinin istegi ikonla ve gorev tipiyle gosterilir.
-4. Oyuncu gerekli istasyonlara, uzman masalarina veya mini-game arayuzlerine gider.
-5. Basarili teslimde sure, skor, combo ve altin kazanilir.
-6. Gunluk gorev veya achievement ilerlemesi varsa ek odul/boost tetiklenir.
-7. Musteri ayrilir, sira kayar ve yeni musteri cagrilir.
-8. Sure biterse oyun sonu tetiklenir.
-
-## Onboarding ve Sube Akisi
-
-### Egitim Subesi
-
-`TutorialManager`, ilk oyuncu deneyimi icin "Soft Opening" egitim subesini yonetir.
-
-- `MoveToCounter`: oyuncu glowing ring / pointer ile giseye yurur.
-- `SimpleTransaction`: tek musteri ile Passbook Update / Hesap Cuzdani benzeri basit islem ogretilir.
-- `TwoStepTransaction`: elektrik faturasi alinir, `BarcodeScanner` ile okutulur ve musteriye teslim edilir.
-- `Completed`: mudur tebrik mesaji gosterilir, `TutorialCompleted` ve `Branch_Tasra_Unlocked` kaydedilir.
-
-Egitimde `TimeManager` geri sayimi durur ve musteri sabri donuktur.
-
-### Sube Secimi
-
-`LevelDifficultyManager` ve `GameSettingsManager`, sube secimini ve zorluk ayarlarini yonetir.
-
-| Sube | Zorluk | Sabir carpani | Musteri araligi | Hirsiz/Raid sansi | Hedef altin |
-| --- | --- | ---: | ---: | ---: | ---: |
-| Tasra Subesi | Easy | 1.0x | 15s | 0.02 | 120 |
-| Sehir Subesi | Medium | 1.5x | 8s | 0.10 | 240 |
-| Metropol Subesi | Hard | 2.2x | 4s | 0.25 | 420 |
-
-Secilen sube `PlayerPrefs` ile saklanir. Oyun sahnesi yuklenince spawn araligi, sabir baskisi, hirsiz/raid sansi ve hedef altin otomatik olceklenir.
-
-## Core Sistemler
-
-### Core
-
-- `Bootstrap`: hedef FPS ve baslangic akisini kurar.
-- `GameManager`: oyun durumunu, secili level bilgisini ve pending booster durumlarini tutar.
-- `GameSettingsManager`: secili sube ayarlarini ve tutorial unlock bilgisini saklar.
-- `SceneLoader`: sahne gecislerini merkezi yapar.
-- `TimeManager`: geri sayim, sure ekleme/cikarma, game over ve time freeze destegi verir.
-- `ScoreManager`: skor, combo, multiplier, run gold ve global gold multiplier akisini yonetir.
-
-### Oyuncu ve Kontroller
-
-- `MobilePlayerController`: joystick input, Grab/Deposit/Action akisi ve HoldPoint tasima.
-- `ChubbyTopDownInputController`: New Input System ile Rigidbody tabanli top-down hareket.
-- `ChubbyRigidbodyCharacterController`: fizik tabanli, hafif kaygan ve tontis hareket hissi.
-- `ScreenJoystick`: mobil sanal joystick.
-- `PlayerInteraction`: nesne alma, elde tutma ve firlatma.
-- `DeliveryPoint`: dogru objeyi teslim etme, sure odulu ve feedback.
-
-### Musteri ve Sira
-
-- `QueueManager`: musteri kuyrugu, bekleme alanlari, gise cagrisi, redirect ve incident akislari.
-- `QueueCustomer`: musteri kimligi, yas/cinsiyet, request icon ve sabir bari.
-- `CustomerPatience`: Calm, Grumpy, Raging durumlari ve yas bazli sabir carpani.
-- `QuestSpawner`: seviye/gun bazli gorev havuzu, weighted spawn ve dynamic pacing.
-- `QuestPoolDirector`: gorev agirliklari, kritik sure quick-win agirligi ve spawn interval boostlari.
-- `DynamicWeatherSystem`: Sunny/Rainy hava dongusu, yagmurda 1.15x sabir baskisi, isik/audio/particle gecisi ve semsiye flag'i.
-- `CustomerQueueDirector`: eski/prototype musteri akisi icin destekleyici sistem.
-
-## Islem Sistemleri
-
-### Hizli Islemler
-
-- `FastTrackActionSystem`: Passbook Printing ve Card Activation gibi kisa isler.
-- `UtilityBillSystem`: elektrik, su ve telefon fatura odeme akisi.
-- `CardBlockMiniGame`: 3 renkli kart blokesi mini-game'i.
-- `MobileActivationMiniGame`: SMS aktivasyonu, 4 haneli kod girisi ve Digital Boost.
-- `WireTransferMiniGame`: alfanumerik transfer kodu, sanal klavye ve Perfect Transfer gold boost.
-
-### Orta ve Uzun Islemler
-
-- `BankingActionSystem`: Withdraw, Deposit ve CurrencyExchange.
-- `CashDeliverySystem`: kasa kapasitesi, merkezden nakit talebi, zirhli arac ve Super Cash Bag.
-- `DocumentProcessWorkflow`: kredi/kart basvurusu, imza, mudur onayi ve teslim.
-- `GoldExchangeWorkflow`: altin ekspertizi, deger makbuzu ve teslim.
-- `VIPEscortSystem`: VIP musteriyi mudur odasina goturen ucgen rota, relief ve praise boost.
-- `VIPCustomer`: VIP gorsel/tempo farklari ve hizli sabir baskisi.
-
-### Yonlendirme ve Uzman Masalari
-
-- `AccountOpeningSystem`: hesap acilis musterisine 0.5 sn stamp atar, Relationship Manager Desk'e yonlendirir ve 2 charge Quick Boost verir.
-- `InsuranceReferralSystem`: sigorta musterisini Insurance Specialist Desk'e yonlendirir ve 12 sn Teamwork Speed Boost verir.
-- `CreditApplicationSystem`: konut/tasit/ihtiyac kredisi sorgular, 80% onay / 20% red sonucu uretir, Credit Specialist Desk'e yonlendirir ve Credit Boost verir.
-- `RedAlertRedirectionSystem`: sabri cok dusuk BarutCustomer'i onceliklendirir, acil sevk eder, +200 Gold ve VIP Relief verir.
-- `StationeryDeliverySystem`: Relationship, Insurance ve Credit masalarina A4/Pen/Stapler destegi tasitir; sonraki yonlendirmelere masa bazli efficiency charge verir.
-
-### Veri Modeli
-
-- `BankTransaction`: islem adi, sure odulu, request icon, gerekli item prefab'i ve zorluk/akis verisi.
-- `CustomerRequestDefinition`: musteri istegi tanimi.
-- `CustomerDefinition`: musteri profili ve olasi istekler.
-
-## Kriz, Destek ve Sube Ici Eventler
-
-- `ThiefEventSystem`: hirsiz musteri, Call Police butonu ve time freeze.
-- `HeistRaidSystem`: nakit teslim donusunde nadir stealth soygun baskini.
-- `CounterIncidentManager`: aktif gise sabri bitince meltdown, -100 Gold, security escort ve Panic Attack debuff.
-- `SecurityGuardAI`: kizgin musteri veya dolandirici gibi hedefleri disari goturen guvenlik akisi.
-- `SecurityGuardRequestEvent`: Recai Abi'nin ara sira giseye telsiz/teçhizat istegiyle gelmesi, tek tiklik Charge Radio butonu, +50 Gold, +10 mudur memnuniyeti, 25 sn High Vigilance dolandirici highlight'i ve 0.7x sabir rahatlatmasi.
-- `WetFloorAccidentSystem`: Cayci Abla temizlik yaparken olusan islak zemin kazasi, dusen musteriyi tek butonla Recai Abi'ye yonlendirme, +100 Gold, +15 mudur memnuniyeti ve 20 sn Compassionate Branch sabir boost'u.
-- `ScammerDetectionSystem`: sahte evrak/foto/tarih kontrolu, decline/security/approve sonuclari.
-- `PhoneInterruptionSystem`: 30-45 saniyelik telefon refleks eventi ve sure carpani.
-- `TwoTierPhoneCallSystem`: telefonu Normal Musteri ve Genel Mudurluk aramasi olarak iki seviyeye ayirir; HQ aramasinda 7 sn cevap penceresi, +200 Gold, +30 mudur memnuniyeti, 20 sn Corporate Grace sabir/gold boost'u ve kacarsa HQ Audit Failed cezasi.
-- `StaffInterruptionSystem`: is arkadasi kesintisi ve ArchiveDesk evrak teslimi.
-- `StaffRequestUrgency`: personel isteklerine 1. derece / 2. derece aciliyet katmani ekler; sari ikon 30 sn rutin pencere, kirmizi yuz + cift unlem 10 sn kritik pencere, basari/kriz odulleri ve mudur memnuniyeti etkileri.
-- `ManagerITSupportEvent`: mudurun bilgisayar arizasi, mini-game tamiri, +150 Gold ve Manager Grace Boost.
-- `ManagerSatisfactionSystem`: mudur memnuniyet bari, Staff Feast, sabir freeze, hiz ve islem boostlari.
-- `BankCatChaosSystem`: Pati kedisi, kuyruk sakinlestirme, panik, guvenlik kovalamacasi.
-- `TeaLadyBoostSystem`: cay/kahve power-up, KafeinMode, Drink/Serve secimi ve Tea Hospitality.
-- `TeaLadyRefillEvent`: cay/kahve bitince Sadiye Abla'nin giseye gelip tek tiklik Refill Brew istegi acmasi, +50 Gold, +10 mudur memnuniyeti ve 15 sn Fresh Brew sabir yavaslatma boost'u.
-- `TeaLadySystem`: cayci teyze teslimati icin alternatif/legacy destek.
-- `LazyAssistantAI`: ikinci gise icin yavas ama otomatik yardimci.
-- `AssistantManager`: kuyruk grumpiness seviyesine gore dolan SummonBar.
-- `SecuritySystem`: en dusuk sabirli musteriyi sakinlestirme veya disari cikarama.
-- `CharityDonationSystem`: hayvan, doga, cocuk ve saglik bagisi ayristirma; Karma Boost.
-
-## Gunluk Gorevler ve Achievement
-
-`QuestAndAchievementManager`, oyuncunun zaten yaptigi aksiyonlari gunluk hedeflere ve uzun vadeli basarimlara baglar.
-
-Gunluk gorev ornekleri:
-
-| Gorev | Hedef | Odul | Ek etki |
-| --- | ---: | ---: | --- |
-| Gune Tontis Basla | 3 musteri memnun yolla | +50 Gold | Kisa sureli sabir rahatlamasi |
-| Sicak Ikram | 1 kez cay dagit | +75 Gold | Musteri sakinlesme etkisi |
-| Mudurun Gozdesi | 1 IT tamiri | +100 Gold | Gecici oyuncu hizi |
-| Sifreyi Coz | 2 SMS/transfer sifresi | +80 Gold | Spawn araligi rahatlatma |
-| Dogru Adres | 2 kredi sevki | +120 Gold | Gecici islem hizi |
-| Pati Sevgisi | 1 kez kedi icin guvenlik cagir | +60 Gold | Kisa sureli sabir rahatlamasi |
-
-Achievement ornekleri:
-
-- `Dedektif Biyigi`: 10 dolandirici yakala.
-- `Yildirim Parmaklar`: 15 perfect typing islemi yap.
-- `Kriz Savar`: 10 BarutCustomer'i patlamadan sevk et.
-- `Lahmacun Selalesi`: 5 kez Staff Feast tetikle.
-- `Kirtasiye Kuryesi`: 15 kirtasiye teslimi yap.
-- `Hayirsever Sube`: 20 bagis islemini dogru tamamla.
-- `Yilin Memuru`: 100 musteriyi basariyla servis et.
-
-Tamamlanan gorev ve basarimlar `PlayerPrefs` ile saklanir, altin odulu verir, sag ustten kayan bildirim banner'i oynatir ve gecici/kalici passive boost uygulayabilir.
-
-## Meta-Game ve Booster Ekonomisi
-
-`PreGameShopManager`, oyuncunun run oncesi booster alisverisini yonetir.
-
-- `PlayerGold`: islemlerden kazanilan soft currency.
-- `Booster_TimeSlow_Qty`: sure akisini 0.85x yapan booster.
-- `Booster_Speed_Qty`: oyuncu hizini 1.2x yapan booster.
-- `Booster_Patience_Qty`: global sabir dususunu 0.75x yapan booster.
-
-`PreLevelPopupController`, seviye baslamadan once booster satis popup'ini acar.
-
-- Hizli satin al ve kusan akisi
-- En fazla 2 aktif booster secimi
-- Anti-Grumpiness kartinda `BestSellerRibbon`
-- `BuyBundleButton` ile 3'lu "Tontis Paket"
-- Bundle satin alinca konfeti ve cash register sesi
-
-## UI
-
-UI Toolkit ve Unity UI birlikte kullaniliyor.
-
-- `MainMenu.uxml`: giris, senaryo ve ayarlar ekranlari.
-- `GameHud.uxml`: skor, combo, multiplier, aktif musteri ve islem paneli.
-- `RushBankTheme.uss`: ortak gorsel tema.
-- `MainMenuUIController`: menu, ayarlar ve level start akisi.
-- `GameHudUIController`: oyun ici sayaclar ve butonlar.
-- `UIManager`: Call Customer cooldown, request icon, time slider ve +s sure feedback'i.
-- `AppSettings`: ses ve titresim ayarlarini `PlayerPrefs` ile saklar.
-- `BestSellerRibbonFloat`: populer booster kurdelesi icin bobbing animasyonu.
-
-## Gorsel Stil
-
-Hedef stil: sicak, renkli, low-poly / stylized, "chubby toon" banka subesi.
-
-- Tontis karakterler
-- Yuvarlatilmis mobilyalar
-- Pastel ve sicak renkler
-- URP mobil hedefli toon shader
-- `docs/CHUBBY_TOON_SHADER.md` icinde Chubby Toon shader rehberi
-- `Assets/Shaders/` altinda shader prototipleri
-
-## Prototype Setup
-
-Unity Editor icinde su arac calistirilir:
-
-```text
-RushBank > Setup Prototype Scenes
-```
-
-Bu arac sahneleri, ornek verileri ve prototip objeleri olusturur/gunceller:
-
-- `Assets/Scenes/Boot.unity`
-- `Assets/Scenes/Login.unity`
-- `Assets/Scenes/MainMenu.unity`
-- `Assets/Scenes/Game.unity`
-- Build Settings sahne sirasi
-- Ana menu ve HUD UI
-- Basit 3D banka ortami
-- Player controller ve joystick altyapisi
-- Queue, Time, Score, Quest, Banking ve Cash sistemleri
-- FastTrack, UtilityBill, VIP, Phone, TeaLady, Heist, Assistant ve Quest/Achievement prototipleri
-- Pre-level booster popup ve bundle satis UI
-
-Kurulumdan sonra `Boot` sahnesi acilip Play'e basilabilir. Hizli kontrol icin dogrudan `Game` sahnesi de acilabilir.
-
-## Klasor Yapisi
-
-```text
-Assets/
-  Editor/        Prototype setup editor araci
-  Prefabs/       Tekrar kullanilabilir prefab'lar
-  Scenes/        Unity sahneleri
-  Scripts/
-    Core/        Baslangic, sahne, sure ve genel ayarlar
-    Gameplay/    Musteri, islem, kriz, ekonomi ve level sistemleri
-    UI/          Menu, HUD, joystick ve popup scriptleri
-  Shaders/       URP toon shader prototipleri
-  UI/
-    Styles/      UI tema dosyalari
-    UXML/        UI Toolkit ekranlari
-Packages/        Unity paket bagimliliklari
-ProjectSettings/ Unity proje ayarlari
-docs/            Product brief, backlog ve teknik notlar
-```
-
-## Kurulum
-
-1. Unity Hub kur.
-2. Unity 6 `6000.0.23f1` veya uyumlu `6000.0.x` surumu kur.
-3. Repoyu klonla:
-
-   ```bash
-   git clone https://github.com/yusufekici24/rush-bank.git
-   ```
-
-4. Unity Hub uzerinden repo klasorunu ac.
-5. Unity Editor'de `RushBank > Setup Prototype Scenes` aracini calistir.
-6. `Boot` sahnesinden Play'e bas.
+- Unity surumu: `6000.5.4f1`
+- Hedef ekran: dikey mobil, `9:16`
+- Render hedefi: URP paketi proje manifestine eklendi
+- Input: Unity New Input System aktif
+- Prototype sahneleri Unity icinden kurulabiliyor: `RushBank > Setup Prototype Scenes`
+- `Game` sahnesi Play Mode'da aciliyor
+- UI gorunuyor, karakter hareket ediyor, Console'da kirmizi hata kalmadi
+- Dikey sahne kompozisyonu baslatildi: alt bolgede oyuncu/gise, orta bolgede bekleme alani, yanlarda uzman masalari, ustte giris ve guvenlik
+
+## Hizli Baslangic
+
+1. Unity Hub ile projeyi ac.
+2. Unity surumunun `6000.5.4f1` oldugundan emin ol.
+3. Console'da kirmizi hata olmadigini kontrol et.
+4. Ust menuden `RushBank > Setup Prototype Scenes` calistir.
+5. `Assets/Scenes/Game.unity` sahnesini ac.
+6. Game View aspect ayarini `9:16` yap.
+7. Play'e bas.
+
+> Not: APK almak icin Unity kurulumunda `Android Build Support`, `Android SDK & NDK Tools` ve `OpenJDK` modulleri gerekir. Sahneleme ve editor testleri icin bu moduller zorunlu degildir.
 
 ## Unity Ayarlari
 
-Merge sorunlarini azaltmak icin:
+Editor icinde onerilen ayarlar:
 
 ```text
 Edit > Project Settings > Editor > Asset Serialization > Mode > Force Text
 Edit > Project Settings > Editor > Version Control > Mode > Visible Meta Files
 ```
 
-`.meta` dosyalari commit edilmelidir. `Library/`, `Temp/`, `Logs/`, `obj/`, `Build/` gibi uretilen klasorler commit edilmez.
+Dikey mobil ayar icin:
 
-## Gelistirme Akisi
+```text
+RushBank > Configure Android Portrait Settings
+```
 
-Her is feature branch uzerinde yapilir:
+Bu arac:
+
+- uygulama adini `RushBank` yapar
+- package name'i `com.yusufekici.rushbank` yapar
+- portrait orientation ayarini uygular
+- landscape yonleri kapatir
+- Android module yoksa kirmizi hata basmadan bilgi verir
+
+## Prototype Sahne Yapisi
+
+`RushBank > Setup Prototype Scenes` araci asagidaki sahneleri olusturur veya gunceller:
+
+- `Assets/Scenes/Boot.unity`
+- `Assets/Scenes/Login.unity`
+- `Assets/Scenes/MainMenu.unity`
+- `Assets/Scenes/Game.unity`
+
+`Game` sahnesinde otomatik kurulan ana alanlar:
+
+- alt bolgede oyuncu ve ana gise
+- orta bolgede dikey bekleme banklari ve bekleme sehpasi
+- solda iki uzman masa alani
+- sagda iki uzman masa alani
+- ust bolgede sube giris kapisi
+- giris kapisi yaninda guvenlik gorevlisi konumu
+- kasa, barkod okuyucu, yazici, dokuman masasi, mudur/uzman masalari ve prototip teslim noktalar
+
+## Gorsel Yon
+
+Hedef stil sicak, okunabilir ve tontis bir low-poly banka subesi gorunumudur.
+
+- Renkler ilk parlak prototipten daha mat ve tasra subesi havasina cekildi.
+- Kamera dikey mobil kadraj icin orthographic/isometric olarak ayarlandi.
+- UI butonlari mobil dokunma icin buyutuldu.
+- Ana oynama alani alt bolgeye alindi; orta/ust bolgede musteri akisi ve yan masa olaylari izlenebilir.
+- Prosedurel gorsel sistem dis model gerektirmeden ilk sahne gorunumunu olusturur.
+
+Ana gorsel dosyalar:
+
+- `Assets/Scripts/Art/RushBankArtLibrary.cs`
+- `Assets/Scripts/Art/ChubbyCharacterDresser.cs`
+- `Assets/Scripts/Gameplay/PrototypeBankEnvironmentBuilder.cs`
+- `Assets/UI/Styles/RushBankTheme.uss`
+
+## Core Oyun Dongusu
+
+1. Musteri subeye girer.
+2. Musteri siraya veya bekleme alanina katilir.
+3. Oyuncu `Call Customer` ile musteriyi giseye cagirir.
+4. Musteri istegi ikon ve gorev tipiyle gosterilir.
+5. Oyuncu gerekli istasyon, masa veya mini-game akisini tamamlar.
+6. Basarili islem sure, skor, combo ve altin kazandirir.
+7. Musteri ayrilir, sira kayar ve yeni musteri cagrilir.
+8. Sure biterse oyun sonu tetiklenir.
+
+## Ana Sistemler
+
+### Core
+
+- `Bootstrap`: baslangic akisi ve FPS hedefi.
+- `GameManager`: oyun durumu, secili level ve pending booster bilgisi.
+- `GameSettingsManager`: sube ayarlari ve tutorial unlock bilgisi.
+- `SceneLoader`: sahne gecisleri.
+- `TimeManager`: geri sayim, sure ekleme/cikarma, game over ve time freeze.
+- `ScoreManager`: skor, combo, multiplier ve altin akisi.
+
+### Oyuncu
+
+- `MobilePlayerController`: joystick hareketi, action/grab/deposit ve HoldPoint.
+- `ChubbyTopDownInputController`: New Input System ile Rigidbody tabanli hareket.
+- `ChubbyRigidbodyCharacterController`: inertia ve tontis hareket hissi.
+- `ScreenJoystick`: mobil sanal joystick.
+- `PlayerInteraction`: nesne alma, tutma ve firlatma.
+
+### Musteri ve Sira
+
+- `QueueManager`: kuyruk, gise cagrisi, servis, redirect ve incident akislari.
+- `QueueCustomer`: musteri kimligi, request icon ve sabir bilgisi.
+- `CustomerPatience`: Calm, Grumpy, Raging ve yas bazli sabir carpani.
+- `QuestSpawner`: weighted musteri/gorev spawn sistemi.
+- `QuestPoolDirector`: gorev havuzu ve kritik sure quick-win pacing.
+- `DynamicWeatherSystem`: Sunny/Rainy dongusu ve yagmurda hafif sabir baskisi.
+
+## Islem Sistemleri
+
+Hizli islemler:
+
+- `FastTrackActionSystem`
+- `UtilityBillSystem`
+- `CardBlockMiniGame`
+- `MobileActivationMiniGame`
+- `WireTransferMiniGame`
+
+Orta ve uzun islemler:
+
+- `BankingActionSystem`
+- `CashDeliverySystem`
+- `DocumentProcessWorkflow`
+- `GoldExchangeWorkflow`
+- `VIPEscortSystem`
+
+Yonlendirme sistemleri:
+
+- `AccountOpeningSystem`
+- `InsuranceReferralSystem`
+- `CreditApplicationSystem`
+- `RedAlertRedirectionSystem`
+- `StationeryDeliverySystem`
+
+Kriz ve destek sistemleri:
+
+- `CounterIncidentManager`
+- `SecurityGuardAI`
+- `ScammerDetectionSystem`
+- `ThiefEventSystem`
+- `HeistRaidSystem`
+- `PhoneInterruptionSystem`
+- `TwoTierPhoneCallSystem`
+- `StaffInterruptionSystem`
+- `StaffRequestUrgency`
+- `ManagerITSupportEvent`
+- `ManagerSatisfactionSystem`
+- `BankCatChaosSystem`
+- `TeaLadyBoostSystem`
+- `TeaLadyRefillEvent`
+- `LazyAssistantAI`
+- `AssistantManager`
+- `WetFloorAccidentSystem`
+
+Meta-game:
+
+- `PreGameShopManager`
+- `PreLevelPopupController`
+- `QuestAndAchievementManager`
+- `LevelDifficultyManager`
+- `TutorialManager`
+
+## Klasor Yapisi
+
+```text
+Assets/
+  Data/          ScriptableObject prototip verileri
+  Editor/        RushBank editor araclari
+  Prefabs/       Prototype transaction prefab'lari
+  Scenes/        Boot, Login, MainMenu, Game
+  Scripts/
+    Art/         Prosedurel gorsel katman
+    Core/        Baslangic, sahne, sure ve genel ayarlar
+    Gameplay/    Musteri, islem, kriz, ekonomi ve level sistemleri
+    UI/          Menu, HUD, joystick ve popup scriptleri
+  UI/
+    Settings/    UI Toolkit panel ayarlari
+    Styles/      USS tema dosyalari
+    UXML/        UI Toolkit ekranlari
+Packages/        Unity paket bagimliliklari
+ProjectSettings/ Unity proje ayarlari
+docs/            Urun, backlog ve PR notlari
+tools/           Yerel Unity acilis yardimci scriptleri
+```
+
+## Git Akisi
+
+Yeni isler feature branch uzerinde yapilir:
 
 ```bash
 git checkout main
 git pull origin main
-git checkout -b feature/ozellik-adi
+git checkout -b agent/ozellik-adi
 ```
 
 Is tamamlaninca:
 
 ```bash
 git status
-git add .
+git add <ilgili-dosyalar>
 git commit -m "Kisa ve aciklayici commit mesaji"
-git push -u origin feature/ozellik-adi
+git push -u origin agent/ozellik-adi
 ```
 
-Ardindan GitHub uzerinden PR acilir. PR Yusuf tarafindan incelenir ve onaylandiktan sonra merge edilir.
+Sonra GitHub uzerinden PR acilir.
 
-## PR Ozeti
+## Dogrulama
 
-Bu branch, RushBank'in script seviyesindeki playable prototype temelini genisletir:
+Bu son sahneleme turunda Unity icinde:
 
-- Musteri sira, sabir, spawn ve zorluk akisi
-- Hizli, orta ve cok istasyonlu bankacilik islemleri
-- Uzman masasi yonlendirme sistemleri
-- Kasa ve nakit teslim dongusu
-- Kriz ve destek eventleri
-- Pre-run booster ekonomisi
-- Gunluk gorev ve achievement sistemi
-- UI/HUD/menu/popup temelleri
-- Chubby toon gorsel stil dokumantasyonu
+- `RushBank > Setup Prototype Scenes` calisti
+- `Game` sahnesi olustu
+- Game View `9:16` olarak test edildi
+- Play Mode goruntu verdi
+- UI gorundu
+- karakter hareket etti
+- Console'da kirmizi hata kalmadi
 
-## Dogrulama Notu
-
-Bu ortamda Unity Editor calistirilmadigi icin scriptlerin Unity compile/play dogrulamasi yapilmamis olabilir. Kod degisikliklerinden sonra Unity Editor'de:
-
-- Console compile hatalari
-- `RushBank > Setup Prototype Scenes`
-- `Boot` sahnesi Play testi
-- Android build ayarlari
-
-kontrol edilmelidir.
+Bir sonraki hedef, ayni portre sahne uzerinden gorsel polish ve temel musteri akisini oynanabilir MVP seviyesine cekmektir.

@@ -562,7 +562,7 @@ namespace RushBank.Gameplay
             var labelObject = new GameObject("Label");
             labelObject.transform.SetParent(buttonObject.transform, false);
             sendGuardButtonLabel = labelObject.AddComponent<Text>();
-            sendGuardButtonLabel.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+            sendGuardButtonLabel.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
             sendGuardButtonLabel.text = "SEND GUARD";
             sendGuardButtonLabel.alignment = TextAnchor.MiddleCenter;
             sendGuardButtonLabel.fontSize = 19;
